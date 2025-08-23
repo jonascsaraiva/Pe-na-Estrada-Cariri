@@ -1,11 +1,11 @@
-class Posto {
+class Localizacoes {
   String nome;
   String endereco;
   String foto;
   double latitude;
   double longitude;
 
-  Posto({
+  Localizacoes({
     required this.nome,
     required this.endereco,
     required this.foto,

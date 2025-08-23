@@ -1,33 +1,52 @@
 import 'package:flutter/material.dart';
-import 'package:pe_na_estrada_cariri/models/posto.dart';
+import 'package:pe_na_estrada_cariri/models/localizacoes.dart';
 
 class PostosRepository extends ChangeNotifier {
-  final List<Posto> _postos = [
-    Posto(
-      nome: 'Posto GT - Rede Rodoil',
-      endereco: 'R. João Negrão, 1072 - Rebouças - Centro, Curitiba - PR',
+  final List<Localizacoes> _postos = [
+    Localizacoes(
+      nome: 'Basílica Menor de Nossa Senhora das Dores',
+      endereco:
+          'Rua da Matriz, 1567 – Salgadinho, Juazeiro do Norte – CE, 63010-040',
       foto:
-          'https://lh5.googleusercontent.com/p/AF1QipP_xnSi5-sp9slSuMpSx-JlmvwvHGL1VJ_JcOGX=w408-h306-k-no',
-      latitude: -25.4361979,
-      longitude: -49.2624613,
+          'https://upload.wikimedia.org/wikipedia/commons/0/0a/Bas%C3%ADlica_de_Nossa_Senhora_das_Dores_-_Juazeiro_do_Norte.jpg',
+      latitude: -7.1983,
+      longitude: -39.3164,
     ),
-    Posto(
-      nome: 'Auto Posto Rodoviária',
-      endereco: 'Av. Presidente Affonso Camargo 10 - Rebouças, Curitiba - PR',
+    Localizacoes(
+      nome: 'Teleférico do Horto',
+      endereco:
+          'Liga a Praça dos Romeiros à Colina do Horto – Juazeiro do Norte – CE',
       foto:
-          'https://lh5.googleusercontent.com/p/AF1QipPnfQSsnvt6-VAxF-fUQ0onQCeRktJptOvSL_9F=w408-h306-k-no',
-      latitude: -25.435538,
-      longitude: -49.2623809,
+          'https://upload.wikimedia.org/wikipedia/commons/6/64/Telef%C3%A9rico_do_Horto_-_Juazeiro_do_Norte.jpg',
+      latitude: -7.2055,
+      longitude: -39.3110,
     ),
-    Posto(
-      nome: 'Auto Posto Nilo Cairo',
-      endereco: 'R. Tibagi, 652 - Centro, Curitiba - PR',
+    Localizacoes(
+      nome: 'Museu Vivo do Padre Cícero',
+      endereco: 'Casarão do Horto, Colina do Horto – Juazeiro do Norte – CE',
       foto:
-          'https://lh5.googleusercontent.com/p/AF1QipOB2w7C9Q_NTblNRhcxJtN3-s4_gSjHI1rs5cSM=w408-h544-k-no',
-      latitude: -25.435260,
-      longitude: -49.2620769,
+          'https://upload.wikimedia.org/wikipedia/commons/1/12/Museu_Vivo_Padre_C%C3%ADcero_-_Juazeiro_do_Norte.jpg',
+      latitude: -7.2095,
+      longitude: -39.3082,
+    ),
+    Localizacoes(
+      nome: 'Trilha do Santo Sepulcro',
+      endereco: 'Colina do Horto – Juazeiro do Norte – CE',
+      foto:
+          'https://upload.wikimedia.org/wikipedia/commons/9/9e/Santo_Sepulcro_Juazeiro_do_Norte.jpg',
+      latitude: -7.2132,
+      longitude: -39.3048,
+    ),
+    Localizacoes(
+      nome: 'Centro Cultural Banco do Nordeste (Cariri)',
+      endereco:
+          'Rua São Pedro, 337 – Centro, Juazeiro do Norte – CE, 63010-010',
+      foto:
+          'https://upload.wikimedia.org/wikipedia/commons/f/fd/Centro_Cultural_Banco_do_Nordeste_-_Juazeiro_do_Norte.jpg',
+      latitude: -7.2136,
+      longitude: -39.3154,
     ),
   ];
 
-  List<Posto> get postos => _postos;
+  List<Localizacoes> get postos => _postos;
 }

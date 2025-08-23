@@ -17,10 +17,10 @@ class _MapPageState extends State<MapPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color.fromRGBO(0, 188, 212, 1),
         title: const Center(
           child: Text('Mapa', style: TextStyle(fontWeight: FontWeight.w500)),
         ),
+        backgroundColor: const Color.fromRGBO(0, 188, 212, 1),
       ),
       body: ChangeNotifierProvider<Geolocalizacao>(
         create: (context) => Geolocalizacao(),
@@ -40,10 +40,14 @@ class _MapPageState extends State<MapPage> {
                 zoom: 18,
               ),
               mapType: MapType.normal,
-              minMaxZoomPreference: MinMaxZoomPreference(15, 20),
               myLocationEnabled: true,
               myLocationButtonEnabled: true,
               zoomControlsEnabled: true,
+              compassEnabled: true,
+              minMaxZoomPreference: MinMaxZoomPreference(15, 40),
+              // trafficEnabled: false,
+              // indoorViewEnabled: false,
+              // buildingsEnabled: false,
             );
           },
         ),
