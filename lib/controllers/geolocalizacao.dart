@@ -1,17 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:pe_na_estrada_cariri/repositories/loc_repository.dart';
 
 class Geolocalizacao extends ChangeNotifier {
   double lat = 0.0;
   double long = 0.0;
   String erro = '';
+  Set<Marker> markers = {};
   late GoogleMapController _mapsController;
 
   get mapsController => _mapsController;
 
   onMapCreated(GoogleMapController gmc) async {
     _mapsController = gmc;
+    getPosicao();
+    loadPostos();
+  }
+
+  //Isso aqui eu posso retornar depois com API ou firebase,etc
+  loadPostos() async {
+    final localizacoes = LocRepository().localizacoes;
+    for (var local in localizacoes) {
+      markers.add(
+        Marker(
+          // Ajeita o icone do marcador
+          // icon: await BitmapDescriptor.fromAssetImage(
+          //   ImageConfiguration(),
+          //   'image/assets',
+          // ),
+          markerId: MarkerId(local.nome),
+          position: LatLng(local.latitude, local.longitude),
+          onTap: () {},
+        ),
+      );
+    }
   }
 
   getPosicao() async {

@@ -13,7 +13,7 @@ class _HomePageState extends State<HomePage> {
 
   /// Páginas que vão aparecer no corpo
   final List<Widget> _pages = const [
-    Center(child: Text("PlaceHolder1")),
+    Center(child: Text("Lista de lugares culturais com descrição e imagem")),
     Center(child: MapPage()),
     Center(child: Text("Favoritos pagina aqui")),
   ];
@@ -25,7 +25,7 @@ class _HomePageState extends State<HomePage> {
     Icons.favorite,
   ];
 
-  final List<String> _titles = const ["PlaceHolder", "Mapa", "Favoritos"];
+  final List<String> _titles = const ["Lista", "Mapa", "Favoritos"];
 
   void _onItemTapped(int index) {
     setState(() => _selectedIndex = index);

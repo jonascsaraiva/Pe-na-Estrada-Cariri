@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
-import 'package:pe_na_estrada_cariri/models/localizacoes.dart';
+import 'package:flutter/widgets.dart';
+import '../models/localizacoes.dart';
 
-class PostosRepository extends ChangeNotifier {
-  final List<Localizacoes> _postos = [
+class LocRepository extends ChangeNotifier {
+  final List<Localizacoes> _localizacoes = [
     Localizacoes(
       nome: 'Basílica Menor de Nossa Senhora das Dores',
       endereco:
@@ -48,5 +48,5 @@ class PostosRepository extends ChangeNotifier {
     ),
   ];
 
-  List<Localizacoes> get postos => _postos;
+  List<Localizacoes> get localizacoes => _localizacoes;
 }

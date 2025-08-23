@@ -32,6 +32,7 @@ class _MapPageState extends State<MapPage> {
                 _mapController = controller;
                 context.read<Geolocalizacao>().onMapCreated(controller);
               },
+              markers: local.markers,
               initialCameraPosition: CameraPosition(
                 target: LatLng(local.lat, local.long),
                 zoom: 18,
@@ -43,7 +44,7 @@ class _MapPageState extends State<MapPage> {
               minMaxZoomPreference: MinMaxZoomPreference(15, 40),
             ),
 
-            // Botão centralizar (inferior direito)
+            // Botão centralizar na localização (inferior direito)
             Positioned(
               bottom: 20,
               right: 20,
