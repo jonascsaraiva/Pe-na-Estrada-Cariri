@@ -14,44 +14,74 @@ class _MapPageState extends State<MapPage> {
   GoogleMapController? _mapController;
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Center(
-          child: Text('Mapa', style: TextStyle(fontWeight: FontWeight.w500)),
-        ),
-        backgroundColor: const Color.fromRGBO(0, 188, 212, 1),
-      ),
-      body: ChangeNotifierProvider<Geolocalizacao>(
-        create: (context) => Geolocalizacao(),
-        child: Consumer<Geolocalizacao>(
-          builder: (context, local, child) {
-            // Atualiza a câmera sem rebuildar o mapa
-            if (_mapController != null) {
-              _mapController!.animateCamera(
-                CameraUpdate.newLatLng(LatLng(local.lat, local.long)),
-              );
-            }
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<Geolocalizacao>().getPosicao();
+    });
+  }
 
-            return GoogleMap(
-              onMapCreated: (controller) => _mapController = controller,
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<Geolocalizacao>(
+      builder: (context, local, child) {
+        return Stack(
+          children: [
+            GoogleMap(
+              onMapCreated: (controller) {
+                _mapController = controller;
+                context.read<Geolocalizacao>().onMapCreated(controller);
+              },
               initialCameraPosition: CameraPosition(
                 target: LatLng(local.lat, local.long),
                 zoom: 18,
               ),
-              mapType: MapType.normal,
               myLocationEnabled: true,
-              myLocationButtonEnabled: true,
-              zoomControlsEnabled: true,
-              compassEnabled: true,
+              myLocationButtonEnabled: false,
+              zoomControlsEnabled: false,
+              mapType: MapType.normal,
               minMaxZoomPreference: MinMaxZoomPreference(15, 40),
-              // trafficEnabled: false,
-              // indoorViewEnabled: false,
-              // buildingsEnabled: false,
-            );
-          },
-        ),
-      ),
+            ),
+
+            // Botão centralizar (inferior direito)
+            Positioned(
+              bottom: 20,
+              right: 20,
+              child: FloatingActionButton(
+                heroTag: "btn1",
+                mini: true,
+                onPressed: () => context.read<Geolocalizacao>().getPosicao(),
+                child: const Icon(Icons.my_location),
+              ),
+            ),
+
+            // Botões de zoom (inferior esquerdo)
+            Positioned(
+              bottom: 20,
+              left: 20,
+              child: Column(
+                children: [
+                  FloatingActionButton(
+                    heroTag: "btn2",
+                    mini: true,
+                    onPressed: () =>
+                        _mapController?.animateCamera(CameraUpdate.zoomIn()),
+                    child: const Icon(Icons.add),
+                  ),
+                  const SizedBox(height: 8),
+                  FloatingActionButton(
+                    heroTag: "btn3",
+                    mini: true,
+                    onPressed: () =>
+                        _mapController?.animateCamera(CameraUpdate.zoomOut()),
+                    child: const Icon(Icons.remove),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
