@@ -52,7 +52,7 @@ class DetailList extends StatelessWidget {
                 Row(
                   children: [
                     Expanded(
-                      child: ElevatedButton.icon(
+                      child: FilledButton.tonalIcon(
                         onPressed: () {
                           context.read<Geolocalizacao>().irParaDestino(
                             LatLng(loc.latitude, loc.longitude),
@@ -65,10 +65,8 @@ class DetailList extends StatelessWidget {
                     ),
                     const SizedBox(width: 15),
                     Expanded(
-                      child: OutlinedButton.icon(
+                      child: FilledButton.tonalIcon(
                         onPressed: () {
-                          // Aqui futuramente chamaremos uma funçãoque busca a rota via API de trajeto
-
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text(
