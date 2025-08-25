@@ -48,7 +48,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         centerTitle: true,
-        backgroundColor: const Color.fromRGBO(0, 188, 212, 1),
+        backgroundColor: Colors.cyan,
       ),
 
       /// IndexedStack mantém todas as páginas carregadas na memória,melhorando eficiencia entre troca de paginas

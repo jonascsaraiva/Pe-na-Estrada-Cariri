@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pe_na_estrada_cariri/pages/detailpages/detail_list.dart';
 import 'package:pe_na_estrada_cariri/repositories/loc_repository.dart';
 
 class ListPage extends StatefulWidget {
@@ -25,37 +26,44 @@ class _ListPageState extends State<ListPage> {
         // Mantém o formato quadrado no 1
         childAspectRatio: 0.9,
       ),
-
-      // Aqui pega a localização por cada index no repositorio e cria um card para cada item da lista.
       itemCount: repo.localizacoes.length,
       itemBuilder: (context, index) {
         final loc = repo.localizacoes[index];
-        return Card(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          clipBehavior: Clip.hardEdge,
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              Image.network(loc.foto, fit: BoxFit.fill),
-              Container(
-                alignment: Alignment.bottomCenter,
-                padding: const EdgeInsets.all(6),
-                color: Colors.black54,
-                child: Text(
-                  loc.nome,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
+        return InkWell(
+          onTap: () {
+            // Ao tocar no card, abre a DetailList passando o objeto loc
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => DetailList(loc: loc)),
+            );
+          },
+          child: Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            clipBehavior: Clip.hardEdge,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                Image.network(loc.foto, fit: BoxFit.fill),
+                Container(
+                  alignment: Alignment.bottomCenter,
+                  padding: const EdgeInsets.all(6),
+                  color: Colors.black54,
+                  child: Text(
+                    loc.nome,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  textAlign: TextAlign.center,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },

@@ -4,7 +4,10 @@ import 'package:pe_na_estrada_cariri/controllers/geolocalizacao.dart';
 import 'package:provider/provider.dart';
 
 class MapPage extends StatefulWidget {
-  const MapPage({super.key});
+  final LatLng? destino; // destino opcional
+  final String? destinoNome; // nome do destino opcional
+
+  const MapPage({super.key, this.destino, this.destinoNome});
 
   @override
   State<MapPage> createState() => _MapPageState();
@@ -17,7 +20,16 @@ class _MapPageState extends State<MapPage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<Geolocalizacao>().getPosicao();
+      final geo = context.read<Geolocalizacao>();
+
+      // Atualiza posição do usuário
+      geo.getPosicao();
+
+      // Se houver destino, adiciona marker e centraliza
+      if (widget.destino != null) {
+        geo.addDestino(widget.destino!, widget.destinoNome ?? "Destino");
+        _mapController?.animateCamera(CameraUpdate.newLatLng(widget.destino!));
+      }
     });
   }
 

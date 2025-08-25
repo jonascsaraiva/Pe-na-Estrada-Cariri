@@ -69,4 +69,15 @@ class Geolocalizacao extends ChangeNotifier {
 
     return await Geolocator.getCurrentPosition();
   }
+
+  void addDestino(LatLng destino, String nome) {
+    markers.add(
+      Marker(
+        markerId: MarkerId(nome),
+        position: destino,
+        infoWindow: InfoWindow(title: nome),
+      ),
+    );
+    notifyListeners();
+  }
 }

@@ -4,6 +4,7 @@ class Localizacoes {
   String foto;
   double latitude;
   double longitude;
+  final String? descricao;
 
   Localizacoes({
     required this.nome,
@@ -11,5 +12,6 @@ class Localizacoes {
     required this.foto,
     required this.latitude,
     required this.longitude,
+    required this.descricao,
   });
 }
