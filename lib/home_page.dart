@@ -1,8 +1,10 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:pe_na_estrada_cariri/controllers/geolocalizacao.dart';
 import 'package:pe_na_estrada_cariri/pages/list_page.dart';
 import 'package:pe_na_estrada_cariri/pages/map_page.dart';
 import 'package:pe_na_estrada_cariri/pages/fav_page.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -13,6 +15,9 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
+  void mudarAba(int index) {
+    setState(() => _selectedIndex = index);
+  }
 
   /// Páginas que vão aparecer no corpo
   final List<Widget> _pages = const [
@@ -36,44 +41,43 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 60,
-        title: Text(
-          _titles[_selectedIndex],
-          style: TextStyle(
-            fontWeight: FontWeight.w700,
-            color: Colors.white,
-            fontSize: 33,
+    return Consumer<Geolocalizacao>(
+      builder: (context, geo, _) {
+        /// se tiver destino definido -> muda para aba do mapa
+        if (geo.destino != null && _selectedIndex != 1) {
+          _selectedIndex = 1;
+          geo.destino = null;
+        }
+
+        return Scaffold(
+          appBar: AppBar(
+            toolbarHeight: 60,
+            title: Text(
+              _titles[_selectedIndex],
+              style: const TextStyle(
+                fontWeight: FontWeight.w700,
+                color: Colors.white,
+                fontSize: 33,
+              ),
+            ),
+            centerTitle: true,
+            backgroundColor: Colors.cyan,
           ),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.cyan,
-      ),
-
-      /// IndexedStack mantém todas as páginas carregadas na memória,melhorando eficiencia entre troca de paginas
-      body: IndexedStack(index: _selectedIndex, children: _pages),
-
-      /// Barra inferior fixa
-      bottomNavigationBar: CurvedNavigationBar(
-        height: 60,
-        animationDuration: Durations.medium2,
-        color: Colors.cyan,
-        buttonBackgroundColor: Colors.cyan,
-        backgroundColor: Colors.transparent,
-
-        index: _selectedIndex,
-        items: _icons
-            .map((icon) => Icon(icon, size: 30, color: Colors.white))
-            .toList(),
-        onTap: _onItemTapped,
-
-        //currentIndex: _selectedIndex,
-        //_pages.length, (i)
-        //icon: Icon(_icons[i])
-        //label: _titles[i]
-        //onTap: _onItemTapped,
-      ),
+          body: IndexedStack(index: _selectedIndex, children: _pages),
+          bottomNavigationBar: CurvedNavigationBar(
+            height: 60,
+            animationDuration: Durations.medium2,
+            color: Colors.cyan,
+            buttonBackgroundColor: Colors.cyan,
+            backgroundColor: Colors.transparent,
+            index: _selectedIndex,
+            items: _icons
+                .map((icon) => Icon(icon, size: 30, color: Colors.white))
+                .toList(),
+            onTap: _onItemTapped,
+          ),
+        );
+      },
     );
   }
 }

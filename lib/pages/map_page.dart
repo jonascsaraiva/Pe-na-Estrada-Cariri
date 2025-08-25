@@ -22,13 +22,17 @@ class _MapPageState extends State<MapPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final geo = context.read<Geolocalizacao>();
 
-      // Atualiza posição do usuário
-      geo.getPosicao();
+      geo.getPosicao(); // sempre atualiza a posição atual
 
-      // Se houver destino, adiciona marker e centraliza
       if (widget.destino != null) {
         geo.addDestino(widget.destino!, widget.destinoNome ?? "Destino");
-        _mapController?.animateCamera(CameraUpdate.newLatLng(widget.destino!));
+
+        // 👉 centralizar no destino
+        Future.delayed(const Duration(milliseconds: 500), () {
+          _mapController?.animateCamera(
+            CameraUpdate.newLatLngZoom(widget.destino!, 17),
+          );
+        });
       }
     });
   }
@@ -47,7 +51,7 @@ class _MapPageState extends State<MapPage> {
               markers: local.markers,
               initialCameraPosition: CameraPosition(
                 target: LatLng(local.lat, local.long),
-                zoom: 18,
+                zoom: 16,
               ),
               myLocationEnabled: true,
               myLocationButtonEnabled: false,

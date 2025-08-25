@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:pe_na_estrada_cariri/controllers/geolocalizacao.dart';
 import 'package:pe_na_estrada_cariri/models/localizacoes.dart';
-import 'package:pe_na_estrada_cariri/pages/map_page.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:provider/provider.dart';
 
 class DetailList extends StatelessWidget {
   final Localizacoes loc;
@@ -13,10 +13,10 @@ class DetailList extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 60,
-        title: Text('Informações'),
+        title: const Text('Informações'),
         backgroundColor: Colors.cyan,
-        titleTextStyle: TextStyle(color: Colors.white, fontSize: 33),
-        iconTheme: IconThemeData(color: Colors.white),
+        titleTextStyle: const TextStyle(color: Colors.white, fontSize: 33),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: ListView(
         children: [
@@ -48,21 +48,16 @@ class DetailList extends StatelessWidget {
                 if (loc.descricao != null)
                   Text(loc.descricao!, style: const TextStyle(fontSize: 20)),
                 const SizedBox(height: 15),
-                Divider(height: 15),
+                const Divider(height: 15),
                 Row(
                   children: [
                     Expanded(
                       child: ElevatedButton.icon(
                         onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => MapPage(
-                                destino: LatLng(loc.latitude, loc.longitude),
-                                destinoNome: loc.nome,
-                              ),
-                            ),
+                          context.read<Geolocalizacao>().irParaDestino(
+                            LatLng(loc.latitude, loc.longitude),
                           );
+                          Navigator.pop(context);
                         },
                         icon: const Icon(Icons.map),
                         label: const Text('Ver no mapa'),
@@ -71,13 +66,15 @@ class DetailList extends StatelessWidget {
                     const SizedBox(width: 15),
                     Expanded(
                       child: OutlinedButton.icon(
-                        onPressed: () async {
-                          final url = Uri.parse(
-                            'https://www.google.com/maps/dir/?api=1&destination=${loc.latitude},${loc.longitude}&travelmode=driving',
-                          );
-                          await launchUrl(
-                            url,
-                            mode: LaunchMode.externalApplication,
+                        onPressed: () {
+                          // Aqui futuramente chamaremos uma funçãoque busca a rota via API de trajeto
+
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                'Função de trajeto ainda não implementada.',
+                              ),
+                            ),
                           );
                         },
                         icon: const Icon(Icons.directions),

@@ -7,6 +7,9 @@ class Geolocalizacao extends ChangeNotifier {
   double lat = 0.0;
   double long = 0.0;
   String erro = '';
+
+  LatLng? destino;
+
   Set<Marker> markers = {};
   late GoogleMapController _mapsController;
 
@@ -24,11 +27,6 @@ class Geolocalizacao extends ChangeNotifier {
     for (var local in localizacoes) {
       markers.add(
         Marker(
-          // Ajeita o icone do marcador
-          // icon: await BitmapDescriptor.fromAssetImage(
-          //   ImageConfiguration(),
-          //   'image/assets',
-          // ),
           markerId: MarkerId(local.nome),
           position: LatLng(local.latitude, local.longitude),
           onTap: () {},
@@ -79,5 +77,11 @@ class Geolocalizacao extends ChangeNotifier {
       ),
     );
     notifyListeners();
+  }
+
+  void irParaDestino(LatLng destino) {
+    this.destino = destino;
+    _mapsController.animateCamera(CameraUpdate.newLatLngZoom(destino, 18));
+    notifyListeners(); // avisa para trocar para o mapa
   }
 }
