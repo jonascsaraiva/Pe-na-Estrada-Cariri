@@ -2,6 +2,7 @@ import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:pe_na_estrada_cariri/pages/list_page.dart';
 import 'package:pe_na_estrada_cariri/pages/map_page.dart';
+import 'package:pe_na_estrada_cariri/pages/fav_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -17,7 +18,7 @@ class _HomePageState extends State<HomePage> {
   final List<Widget> _pages = const [
     Center(child: ListPage()),
     Center(child: MapPage()),
-    Center(child: Text("Favoritos pagina aqui")),
+    Center(child: FavPage()),
   ];
 
   /// Ícones e rótulos para o BottomNavigation
@@ -37,6 +38,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        toolbarHeight: 60,
         title: Text(
           _titles[_selectedIndex],
           style: TextStyle(
@@ -49,7 +51,7 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: const Color.fromRGBO(0, 188, 212, 1),
       ),
 
-      /// IndexedStack mantém todas as páginas carregadas na memória
+      /// IndexedStack mantém todas as páginas carregadas na memória,melhorando eficiencia entre troca de paginas
       body: IndexedStack(index: _selectedIndex, children: _pages),
 
       /// Barra inferior fixa
