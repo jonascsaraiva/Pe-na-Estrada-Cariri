@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:pe_na_estrada_cariri/controllers/geolocalizacao.dart';
+import 'package:pe_na_estrada_cariri/controllers/trajetoria.dart';
 import 'package:pe_na_estrada_cariri/models/localizacoes.dart';
 import 'package:provider/provider.dart';
 
@@ -54,6 +55,7 @@ class DetailList extends StatelessWidget {
                     Expanded(
                       child: FilledButton.tonalIcon(
                         onPressed: () {
+                          // Apenas move o mapa para o destino
                           context.read<Geolocalizacao>().irParaDestino(
                             LatLng(loc.latitude, loc.longitude),
                           );
@@ -65,15 +67,42 @@ class DetailList extends StatelessWidget {
                     ),
                     const SizedBox(width: 15),
                     Expanded(
-                      child: FilledButton.tonalIcon(
-                        onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                'Função de trajeto ainda não implementada.',
-                              ),
-                            ),
-                          );
+                      child: OutlinedButton.icon(
+                        onPressed: () async {
+                          debugPrint("Iniciando geração de rota...");
+                          final geo = context.read<Geolocalizacao>();
+                          final trajetoria = context.read<Trajetoria>();
+                          final navigator = Navigator.of(context);
+                          final messenger = ScaffoldMessenger.of(context);
+
+                          try {
+                            debugPrint("Obtendo posição atual...");
+                            final origem = await geo.getPosicao();
+
+                            debugPrint("Posição atual: $origem");
+
+                            final destino = LatLng(loc.latitude, loc.longitude);
+                            debugPrint("Destino: $destino");
+
+                            debugPrint("Criando rota no mapa...");
+                            await trajetoria.criarRota(origem, destino);
+                            debugPrint("Rota criada com sucesso!");
+
+                            debugPrint("Adicionando marcador de destino...");
+                            geo.addDestino(destino, loc.nome);
+                            debugPrint("Marcador adicionado!");
+
+                            debugPrint("Voltando para a aba do mapa...");
+                            navigator.popUntil((route) => route.isFirst);
+                            debugPrint("Navegação concluída!");
+                          } catch (e, stack) {
+                            debugPrint("Falha ao gerar rota: $e");
+                            debugPrint("Stacktrace: $stack");
+
+                            messenger.showSnackBar(
+                              SnackBar(content: Text('Erro ao gerar rota: $e')),
+                            );
+                          }
                         },
                         icon: const Icon(Icons.directions),
                         label: const Text('Como chegar'),

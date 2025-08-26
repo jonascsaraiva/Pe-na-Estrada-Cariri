@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pe_na_estrada_cariri/controllers/trajetoria.dart';
 import 'package:pe_na_estrada_cariri/home_page.dart';
 import 'package:pe_na_estrada_cariri/controllers/geolocalizacao.dart';
 import 'package:provider/provider.dart';
@@ -14,7 +15,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: [ChangeNotifierProvider(create: (_) => Geolocalizacao())],
+      providers: [
+        ChangeNotifierProvider(create: (_) => Geolocalizacao()),
+        ChangeNotifierProvider(create: (_) => Trajetoria()),
+      ],
       child: MaterialApp(
         title: 'Pé na estrada Cariri',
         debugShowCheckedModeBanner: false,
