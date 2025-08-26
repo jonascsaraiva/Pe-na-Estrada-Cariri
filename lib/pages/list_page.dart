@@ -12,61 +12,139 @@ class ListPage extends StatefulWidget {
 final LocRepository repo = LocRepository();
 
 class _ListPageState extends State<ListPage> {
+  String searchQuery = '';
+  String sortOrder = 'A–Z';
+
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
-      padding: const EdgeInsets.all(6),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        //Quantidade de Cards por linhas
-        crossAxisCount: 2,
-        //Espaçamento Horizontal ente os Cards
-        crossAxisSpacing: 6,
-        //Vertical
-        mainAxisSpacing: 6,
-        // Mantém o formato quadrado no 1
-        childAspectRatio: 1.6,
-      ),
-      itemCount: repo.localizacoes.length,
-      itemBuilder: (context, index) {
-        final loc = repo.localizacoes[index];
-        return InkWell(
-          onTap: () {
-            // Ao tocar no card, abre a DetailList passando o objeto loc
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => DetailList(loc: loc)),
-            );
-          },
-          child: Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            clipBehavior: Clip.hardEdge,
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                Image.network(loc.foto, fit: BoxFit.fill),
-                Container(
-                  alignment: Alignment.bottomCenter,
-                  padding: const EdgeInsets.all(6),
-                  color: Colors.black54,
-                  child: Text(
-                    loc.nome,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
+    // aplica filtro pelo nome
+    List filtered = repo.localizacoes
+        .where(
+          (loc) => loc.nome.toLowerCase().contains(searchQuery.toLowerCase()),
+        )
+        .toList();
+
+    // aplica ordenação
+    filtered.sort((a, b) {
+      int cmp = a.nome.compareTo(b.nome);
+      return sortOrder == 'A–Z' ? cmp : -cmp;
+    });
+
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(8),
+          child: Row(
+            children: [
+              // Barra de busca aqui
+              Expanded(
+                child: TextField(
+                  decoration: InputDecoration(
+                    hintText: 'Pesquisar',
+                    prefixIcon: const Icon(Icons.search),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    textAlign: TextAlign.center,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+                  ),
+                  onChanged: (value) {
+                    setState(() {
+                      searchQuery = value;
+                    });
+                  },
+                ),
+              ),
+              const SizedBox(width: 7),
+              // Dropdow de ordenação aqui
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: const Color.fromARGB(255, 138, 138, 138),
                   ),
                 ),
-              ],
-            ),
+                child: DropdownButton<String>(
+                  value: sortOrder,
+                  items: const [
+                    DropdownMenuItem(
+                      value: 'A–Z',
+                      child: Text('Crescente', style: TextStyle(fontSize: 15)),
+                    ),
+                    DropdownMenuItem(
+                      value: 'Z–A',
+                      child: Text(
+                        'Decrescente',
+                        style: TextStyle(fontSize: 15),
+                      ),
+                    ),
+                  ],
+                  onChanged: (value) {
+                    if (value != null) {
+                      setState(() {
+                        sortOrder = value;
+                      });
+                    }
+                  },
+                ),
+              ),
+            ],
           ),
-        );
-      },
+        ),
+        Divider(height: 1),
+        // Lista dos blocos
+        Expanded(
+          child: GridView.builder(
+            padding: const EdgeInsets.all(6),
+            //Aqui estiliza os blocos da lista
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 7,
+              mainAxisSpacing: 7,
+              childAspectRatio: 1.6,
+            ),
+            itemCount: filtered.length,
+            itemBuilder: (context, index) {
+              final loc = filtered[index];
+              return InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => DetailList(loc: loc)),
+                  );
+                },
+                child: Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  clipBehavior: Clip.hardEdge,
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      Image.network(loc.foto, fit: BoxFit.fill),
+                      Container(
+                        alignment: Alignment.bottomCenter,
+                        padding: const EdgeInsets.all(6),
+                        color: Colors.black54,
+                        child: Text(
+                          loc.nome,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }

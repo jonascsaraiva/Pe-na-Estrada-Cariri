@@ -149,7 +149,7 @@ class LocRepository extends ChangeNotifier {
       endereco:
           'Horto Estação Beata (Colina do Horto) e no Salgadinho Estação Monsenhor (Av. do Agricultor), Juazeiro do Norte - CE',
       foto:
-          'https://www.miseria.com.br/wp-content/uploads/2024/06/teleferico-do-horto-complexo-ambiental-caminhos-do-horto-jpeg.webp',
+          'https://nocariritem.com.br/wp-content/uploads/2024/03/IMG_9563-scaled.jpeg',
       latitude: -7.178546981885765,
       longitude: -39.33028120099665,
       descricao:
