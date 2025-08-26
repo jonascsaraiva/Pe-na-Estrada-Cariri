@@ -53,7 +53,7 @@ class DetailList extends StatelessWidget {
                 Row(
                   children: [
                     Expanded(
-                      child: FilledButton.tonalIcon(
+                      child: OutlinedButton.icon(
                         onPressed: () {
                           // Apenas move o mapa para o destino
                           context.read<Geolocalizacao>().irParaDestino(
@@ -72,7 +72,6 @@ class DetailList extends StatelessWidget {
                           debugPrint("Iniciando geração de rota...");
                           final geo = context.read<Geolocalizacao>();
                           final trajetoria = context.read<Trajetoria>();
-                          final navigator = Navigator.of(context);
                           final messenger = ScaffoldMessenger.of(context);
 
                           try {
@@ -90,10 +89,16 @@ class DetailList extends StatelessWidget {
 
                             debugPrint("Adicionando marcador de destino...");
                             geo.addDestino(destino, loc.nome);
-                            debugPrint("Marcador adicionado!");
+
+                            // Define o destino para o Consumer do HomePage
+                            geo.destino = destino;
+                            geo.irParaDestino(destino); // centraliza no mapa
 
                             debugPrint("Voltando para a aba do mapa...");
-                            navigator.popUntil((route) => route.isFirst);
+                            Navigator.of(
+                              // ignore: use_build_context_synchronously
+                              context,
+                            ).popUntil((route) => route.isFirst);
                             debugPrint("Navegação concluída!");
                           } catch (e, stack) {
                             debugPrint("Falha ao gerar rota: $e");

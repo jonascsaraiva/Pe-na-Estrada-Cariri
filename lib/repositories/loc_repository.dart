@@ -174,6 +174,189 @@ class LocRepository extends ChangeNotifier {
       descricao:
           'A Estátua de Padre Cícero na Colina do Horto é um monumento construído em homenagem ao Padre Cícero e mede 27 metros de altura.',
     ),
+    Localizacoes(
+      nome: 'Igreja do Bom Jesus do Horto',
+      endereco: 'Colina do Horto, Horto 63012-010',
+      foto:
+          'https://s2-g1.glbimg.com/rAkQ-kg1Z9SpW6zfPRqnSnJlc-A=/0x0:2048x1536/984x0/smart/filters:strip_icc()/i.s3.glbimg.com/v1/AUTH_59edd422c0c84a879bd37670ae4f538a/internal_photos/bs/2024/o/h/DtBKhYQMWw9jDN0Hz1Cg/bom-jesus-do-horto.jpeg',
+      latitude: -7.176623304379405,
+      longitude: -39.333483071164515,
+      descricao:
+          'Uma belíssima e moderna catedral, em formato espiral muito alta e ventilada, já é mesmo antes de sua conclusão, um ponto importante a ser conhecido na região do Cariri.',
+    ),
+    Localizacoes(
+      nome: 'Igreja Menino Jesus de Praga',
+      endereco: 'Av. Pres. Castelo Branco, s/n - Novo Juazeiro, 63030-200',
+      foto:
+          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSA7FiGLRQQoM8tc3w8q7yh8LpJUDMrM9ntRg&s',
+      latitude: -7.2294291114859375,
+      longitude: -39.29387777140714,
+      descricao:
+          'É muito recomendada para celebrações de casamento. Tem nos seus arredores uma praça agradável com boas opções de lanches.',
+    ),
+    Localizacoes(
+      nome: 'La Plaza Shopping',
+      endereco: 'Rua José de Matos França, 690 - Lagoa Seca',
+      foto:
+          'https://laplazashopping.com.br/wp-content/uploads/2024/01/site-scaled.jpg',
+      latitude: -7.244025283245983,
+      longitude: -39.32266308814686,
+      descricao:
+          'Encontre tudo o que você precisa no Shopping La Plaza. Com lojas exclusivas e uma infraestrutura incomparável.',
+    ),
+    Localizacoes(
+      nome: 'Lira Nordestina',
+      endereco: 'Rua Interventor Francisco Erivano Cruz - Centro, 63011-085',
+      foto:
+          'https://artesol.org.br/wp-content/uploads/2024/08/LIRA-NE-KITY-RAMOS050-scaled.jpg',
+      latitude: -7.193285238670501,
+      longitude: -39.31597917655943,
+      descricao:
+          'A Lira Nordestina é um equipamento cultural vinculado à Pró-reitoria de Extensão da URCA e é referência em xilogravura.',
+    ),
+    Localizacoes(
+      nome: 'Luzeiro da Fé',
+      endereco: 'Rua Padre José Alves - Salesianos, 63050-222',
+      foto:
+          'https://artederua.com.br/sites/contents/pics/arte_de_rua-luazeiro_da_fe.jpg',
+      latitude: -7.190949954695875,
+      longitude: -39.3156698648599,
+      descricao:
+          'Inaugurado em 1º de novembro de 2005, trata-se da maior torre do Nordeste brasileiro. É uma homenagem aos milhares de romeiros que visitam Juazeiro do Norte.',
+    ),
+    Localizacoes(
+      nome: 'Memorial Padre Cícero',
+      endereco:
+          'Praça do Cinquentenário, s/n - Centro, Juazeiro do Norte - CE, 63010-242',
+      foto: 'https://juazeirodonorte.ce.gov.br/fotos/26555/Img0_600x400.jpg',
+      latitude: -7.200982231770824,
+      longitude: -39.320609476559355,
+      descricao:
+          'A sede do Memorial Padre Cícero está temporariamente fechada para obras, por este motivo foi transferida para o prédio Palácio José Geraldo da Cruz, antigo prédio da prefeitura.',
+    ),
+    Localizacoes(
+      nome: 'Museu Casa do Doce Madeilton',
+      endereco: 'Rua Santa Luzia, N°545 - Centro',
+      foto: 'https://live.staticflickr.com/65535/52969473676_13c9e3cf1c.jpg',
+      latitude: -7.204295098962611,
+      longitude: -39.31643833622336,
+      descricao:
+          'Patrimônio Cultural Imaterial da cidade, a Casa do Doce João Martins é considerada o point preferido para quem não abre mão daquele bom doce caseiro.',
+    ),
+    Localizacoes(
+      nome: 'Museu Casa do Mestre Nena',
+      endereco:
+          'Rua Senhor do Bonfim, 524 - João Cabral, em frente à Praça Adones Callou (conhecida como Praça do CC)',
+      foto:
+          'https://mapacultural.secult.ce.gov.br/files/agent/31035/museu_casa_do_mestre_nena_em_juazeiro_do_norte_cear%C3%A1.jpg',
+      latitude: -7.23160989251771,
+      longitude: -39.319484405394604,
+      descricao:
+          'No dia 07 de agosto de 2019 foi contemplado com o projeto Museu Orgânico Casa do Mestre Nena, proporcionado pelas entidades Casa Grande e SESC-CE.',
+    ),
+    Localizacoes(
+      nome: 'Casarão do Padre Cícero',
+      endereco: 'Colina Do Horto S/N, 63012-010',
+      foto:
+          'https://tvbrasil.ebc.com.br/sites/default/files/atoms/image/fachada_museu_vivo_do_padre_cicero_grande.jpg',
+      latitude: -7.1794944302845405,
+      longitude: -39.330515674711094,
+      descricao:
+          'Inaugurado em 1º de novembro de 1999, no velho Casarão do Horto, retrata e preserva, em personagens em tamanho real, a vida e obra religiosa do padre Cícero Romão Batista.',
+    ),
+    Localizacoes(
+      nome: 'Paróquia Nossa Senhora de Lourdes - Igreja de São Miguel',
+      endereco:
+          'R. São Francisco, 1114 - São Miguel, Juazeiro do Norte - CE, 63010-475',
+      foto:
+          'https://cdn.diocesedecrato.org/wp-content/uploads/2014/05/10379129_467779489991830_316529081_n.jpg',
+      latitude: -7.20474663388835,
+      longitude: -39.31000807655927,
+      descricao:
+          'Foi instituída no dia 1º de Maio de 1958, pelo então bispo diocesano Dom Francisco de Assis Pires. Sendo a primeira paróquia de Juazeiro, depois da de Nossa Senhora das Dores.',
+    ),
+    Localizacoes(
+      nome: 'Parque de Eventos Padre Cícero',
+      endereco: 'Rua Vicente Teixeira de Macedo, s/n - Planalto, 63047-245',
+      foto:
+          'https://www.miseria.com.br/wp-content/uploads/2022/06/parque-padre-cicero-1-1-1.jpg',
+      latitude: -7.244051256063577,
+      longitude: -39.30054154772331,
+      descricao:
+          'Centro de exposições da cidade. Local de festividades. Localizado na Rua Vicente Teixeira de Macedo, 05 - Planalto.',
+    ),
+    Localizacoes(
+      nome: 'Parque Natural Municipal das Timbaúbas',
+      endereco: 'Avenida Ailton Gomes, nº s/n - Centro, CEP: 63.020-000',
+      foto: 'https://www.miseria.com.br/wp-content/uploads/2021/02/013-21.jpg',
+      latitude: -7.236702438641257,
+      longitude: -39.3125544765589,
+      descricao:
+          'No interior do parque estão localizadas 11 fontes naturais, que são responsáveis por 70% do abastecimento da cidade com água potável.',
+    ),
+    Localizacoes(
+      nome: 'Pedra do Joelho',
+      endereco:
+          'R. José Arnaldo Bezerra Filho - Horto, Juazeiro do Norte - CE, 63012-110',
+      foto:
+          'https://jornaldocariri.com.br/wp-content/uploads/2021/05/1622212620-1.jpeg',
+      latitude: -7.184770111838128,
+      longitude: -39.33283466306593,
+      descricao:
+          'A Pedra do Joelho é um bloco de granito com sulcos em sua formação. Na crença popular acredita-se que as marcas na pedra representam impressões de um joelho, dos pés de uma criança e da região lombar de uma coluna, simbolizando respectivamente os joelhos de Nossa Senhora, os pés do menino Jesus e a coluna de São José.',
+    ),
+    Localizacoes(
+      nome: 'Praça Padre Cícero',
+      endereco: 'R. São Pedro, s/n - Centro, Juazeiro do Norte - CE, 63010-010',
+      foto: 'https://tyba.com.br/fotos/foto/cd221_053.jpg',
+      latitude: -7.200915344966156,
+      longitude: -39.31767940003532,
+      descricao:
+          'A Praça Almirante Alexandrino de Alencar foi inaugurada em 1925, pelo Padre Cícero Romão Batista, então prefeito da cidade de Juazeiro do Norte.',
+    ),
+    Localizacoes(
+      nome: 'Centro Cultural Daniel Walker',
+      endereco: 'R. São Bernardo, 724 - Franciscanos',
+      foto:
+          'https://upload.wikimedia.org/wikipedia/commons/2/24/Pra%C3%A7a_Padre_C%C3%ADcero_no_centro_de_Juazeiro_do_Norte.jpg',
+      latitude: -7.209428680532103,
+      longitude: -39.31359443423024,
+      descricao:
+          'Conhecida popularmente como R.F.F.S.A (Rede Ferroviária Federal Sociedade Anônima), foi inaugurada em 7 de novembro de 1926.',
+    ),
+    Localizacoes(
+      nome: 'Santuário de São Francisco das Chagas',
+      endereco:
+          'Praça Mons. Joviniano Barreto, s/n - Franciscanos, Juazeiro do Norte - CE, 63020-020',
+      foto:
+          'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/14/44/ea/c7/photo0jpg.jpg?w=900&h=500&s=1',
+      latitude: -7.211555749805156,
+      longitude: -39.31387613423009,
+      descricao:
+          'Sob os cuidados da Ordem dos Frades Menores Capuchinhos (OFMCap) foi edificado o Santuário dedicado a São Francisco das Chagas, inaugurado em 06 de janeiro de 1950.',
+    ),
+    Localizacoes(
+      nome: 'Santuário do Sagrado Coração de Jesus',
+      endereco:
+          'R. Padre Cícero, 1387-1589 - Centro, Juazeiro do Norte - CE, 63010-020',
+      foto:
+          'https://cdn.diocesedecrato.org/wp-content/uploads/2014/05/WhatsApp-Image-2020-11-24-at-11.10.27.jpeg',
+      latitude: -7.210422437083145,
+      longitude: -39.321864647723736,
+      descricao:
+          'A Igreja dos Salesianos, como é mais conhecida pelos fiéis, começou a ser construída em 1949 e foi inaugurada em 7 de maio de 1978.',
+    ),
+    Localizacoes(
+      nome: 'Teatro Municipal Marquise Branca',
+      endereco:
+          'Av. Padre Cícero, S/N - Salesianos, Juazeiro do Norte - CE, 63050-295',
+      foto:
+          'https://cariridasantigas.com.br/wp-content/uploads/2021/04/dadf1876-f5b9-44a1-afaa-48ef1e1f323d.jpeg',
+      latitude: -7.2172858162462035,
+      longitude: -39.32501772073638,
+      descricao:
+          'O Teatro Marquise Branca funciona em um dos prédios mais antigos de Juazeiro do Norte, está fechado temporariamente para obras.',
+    ),
   ];
 
   List<Localizacoes> get localizacoes => _localizacoes;

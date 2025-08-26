@@ -97,7 +97,7 @@ class Geolocalizacao extends ChangeNotifier {
   /// Vai para o destino no mapa
   void irParaDestino(LatLng destino) {
     this.destino = destino;
-    _mapsController.animateCamera(CameraUpdate.newLatLngZoom(destino, 18));
+    _mapsController.animateCamera(CameraUpdate.newLatLngZoom(destino, 15));
     notifyListeners();
   }
 }

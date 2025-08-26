@@ -43,9 +43,11 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Consumer<Geolocalizacao>(
       builder: (context, geo, _) {
-        /// se tiver destino definido -> muda para aba do mapa
+        // Se houver destino definido no Geolocalizacao, muda para aba do mapa automaticamente.
         if (geo.destino != null && _selectedIndex != 1) {
           _selectedIndex = 1;
+          // Chama a função para centralizar no destino
+          geo.irParaDestino(geo.destino!);
           geo.destino = null;
         }
 
