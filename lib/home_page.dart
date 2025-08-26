@@ -68,7 +68,7 @@ class _HomePageState extends State<HomePage> {
           body: IndexedStack(index: _selectedIndex, children: _pages),
           bottomNavigationBar: CurvedNavigationBar(
             height: 60,
-            animationDuration: Durations.medium2,
+            animationDuration: Durations.medium4,
             color: Colors.cyan,
             buttonBackgroundColor: Colors.cyan,
             backgroundColor: Colors.transparent,

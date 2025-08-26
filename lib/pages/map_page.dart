@@ -28,7 +28,7 @@ class _MapPageState extends State<MapPage> {
       if (widget.destino != null) {
         geo.addDestino(widget.destino!, widget.destinoNome ?? "Destino");
 
-        // 👉 centralizar no destino
+        // centraliza no destino
         Future.delayed(const Duration(milliseconds: 500), () {
           _mapController?.animateCamera(
             CameraUpdate.newLatLngZoom(widget.destino!, 17),
@@ -53,30 +53,34 @@ class _MapPageState extends State<MapPage> {
               polylines: traj.polylines,
               initialCameraPosition: CameraPosition(
                 target: LatLng(geo.lat, geo.long),
-                zoom: 18,
+                zoom: 17,
               ),
               myLocationEnabled: true,
               myLocationButtonEnabled: false,
               zoomControlsEnabled: false,
               mapType: MapType.normal,
             ),
+
+            // botão localização
             Positioned(
               bottom: 20,
               right: 20,
               child: FloatingActionButton(
-                heroTag: "btn1",
+                heroTag: "btnLocalizacao",
                 mini: true,
                 onPressed: () => geo.getPosicao(),
                 child: const Icon(Icons.my_location),
               ),
             ),
+
+            // botões zoom
             Positioned(
               bottom: 20,
               left: 20,
               child: Column(
                 children: [
                   FloatingActionButton(
-                    heroTag: "btn2",
+                    heroTag: "btnZoomIn",
                     mini: true,
                     onPressed: () =>
                         _mapController?.animateCamera(CameraUpdate.zoomIn()),
@@ -84,7 +88,7 @@ class _MapPageState extends State<MapPage> {
                   ),
                   const SizedBox(height: 8),
                   FloatingActionButton(
-                    heroTag: "btn3",
+                    heroTag: "btnZoomOut",
                     mini: true,
                     onPressed: () =>
                         _mapController?.animateCamera(CameraUpdate.zoomOut()),
@@ -93,6 +97,35 @@ class _MapPageState extends State<MapPage> {
                 ],
               ),
             ),
+
+            // Botão de rota que aparece ao clicar no marcador
+            if (geo.marcadorSelecionado != null)
+              Positioned(
+                bottom: 20,
+                left: MediaQuery.of(context).size.width / 2 - 60,
+                child: FloatingActionButton.extended(
+                  heroTag: "btnRotas",
+                  onPressed: () async {
+                    final origem = await geo.getPosicao();
+                    final destino = geo.marcadorSelecionado!;
+
+                    if (!context.mounted) return;
+
+                    await context.read<Trajetoria>().criarRota(origem, destino);
+                    geo.addDestino(destino, "Destino");
+
+                    _mapController?.animateCamera(
+                      CameraUpdate.newLatLngZoom(destino, 17),
+                    );
+
+                    // esconde o botão depois
+                    geo.marcadorSelecionado = null;
+                    geo.atualizar();
+                  },
+                  label: const Text("Como chegar"),
+                  icon: const Icon(Icons.directions),
+                ),
+              ),
           ],
         );
       },

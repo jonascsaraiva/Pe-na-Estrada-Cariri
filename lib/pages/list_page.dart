@@ -15,7 +15,7 @@ class _ListPageState extends State<ListPage> {
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.all(6),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         //Quantidade de Cards por linhas
         crossAxisCount: 2,
@@ -24,7 +24,7 @@ class _ListPageState extends State<ListPage> {
         //Vertical
         mainAxisSpacing: 6,
         // Mantém o formato quadrado no 1
-        childAspectRatio: 0.9,
+        childAspectRatio: 1.6,
       ),
       itemCount: repo.localizacoes.length,
       itemBuilder: (context, index) {

@@ -15,7 +15,7 @@ class LocRepository extends ChangeNotifier {
           'O Mosteiro de Nossa Senhora da Vitória foi fundado em 21 de novembro de 1982, na cidade histórica de São Cristóvão - SE, pelo Mosteiro de Nossa Senhora de Monte em Olinda.',
     ),
     Localizacoes(
-      nome: 'Aeroporto de Juazeiro do Norte - Orlando Bezerra de Menezes',
+      nome: 'Aeroporto - Orlando Bezerra de Menezes',
       endereco:
           'Av. Gov. Virgílio Távora, 4000 - Aeroporto, Juazeiro do Norte - CE, 63020-735',
       foto:
@@ -26,7 +26,7 @@ class LocRepository extends ChangeNotifier {
           'O Aeroporto de Juazeiro do Norte - Orlando Bezerra de Menezes se destaca pelo turismo de negócios e também por ser o único localizado no sul do estado do Ceará.',
     ),
     Localizacoes(
-      nome: 'Alameda Juazeiro – Centro de Gastronomia Rita Araújo da Silva',
+      nome: 'Alameda – Centro de Gastronomia Rita Araújo da Silva',
       endereco:
           'Rua São Francisco S/N - Centro, Juazeiro do Norte - CE, 63010-475',
       foto:
@@ -156,6 +156,17 @@ class LocRepository extends ChangeNotifier {
           'É um sistema de teleférico instalado na cidade, ligando as estações Romeiros e Horto.',
     ),
     Localizacoes(
+      nome: 'Teleférico do Horto - Estação Monsenhor Murilo de Sá Barreto',
+      endereco:
+          'Horto Estação Beata (Colina do Horto) e no Salgadinho Estação Monsenhor (Av. do Agricultor), Juazeiro do Norte - CE',
+      foto:
+          'https://www.miseria.com.br/wp-content/uploads/2024/06/teleferico-do-horto-complexo-ambiental-caminhos-do-horto-jpeg.webp',
+      latitude: -7.191483191863262,
+      longitude: -39.31715365189599,
+      descricao:
+          'É um sistema de teleférico instalado na cidade, ligando as estações Romeiros e Horto.',
+    ),
+    Localizacoes(
       nome: 'Estações da Via Sacra na Rua do Horto',
       endereco: 'Antiga Rua de Pedra do Horto, Juazeiro do Norte - CE',
       foto: 'https://vault.pulsarimagens.com.br/file/preview/04MAS269.jpg',
@@ -232,7 +243,7 @@ class LocRepository extends ChangeNotifier {
       latitude: -7.200982231770824,
       longitude: -39.320609476559355,
       descricao:
-          'A sede do Memorial Padre Cícero está temporariamente fechada para obras, por este motivo foi transferida para o prédio Palácio José Geraldo da Cruz, antigo prédio da prefeitura.',
+          'A sede do Memorial Padre Cícero está temporariamente fechada para obras, por este motivo foi transferida para o prédio Palácio José Geraldo da Cruz, antigo prédio da prefeitura.O Museu conserva um acervo variado, composto por mais de 2.000 peças, entre mobílias, indumentárias, louças, fotografias, quadros e outros itens que pertenceram ao Padre Cícero ou que se relacionam com a sua vida. Parte fica em exposição e outra na biblioteca. É uma coleção cujo núcleo inicial partiu de um acervo dos pesquisadores Daniel Walker e Renato Casimiro, mas que, depois, foi expandida com várias doações da sociedade juazeirense, a partir da atuação de uma comissão composta por Abraão Batista, Assunção Gonçalves, Daniel Walker, Nair Silva, Pe. José Alves, Pe. Murilo de Sá Barreto e Renato Casimiro A Biblioteca, por sua diversidade de suportes, pode ser considerada um Centro de Documentação. Possui livros, revistas, jornais, fotografias, documentos impressos e manuscritos, que também tratam da trajetória do Padre Cícero, bem como das personalidades históricas relacionadas à sua vivência, do município de Juazeiro do Norte e da região do Cariri. Tem por objetivo atender prioritariamente a comunidade acadêmica (estudiosos e pesquisadores), bem como os demais interessados nesses temas. Em 2017, foram contabilizados mais de 12 mil itens em seu recinto',
     ),
     Localizacoes(
       nome: 'Museu Casa do Doce Madeilton',

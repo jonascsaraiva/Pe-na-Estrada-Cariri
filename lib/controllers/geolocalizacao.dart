@@ -11,6 +11,8 @@ class Geolocalizacao extends ChangeNotifier {
   LatLng? destino;
 
   Set<Marker> markers = {};
+  LatLng? marcadorSelecionado;
+
   late GoogleMapController _mapsController;
 
   get mapsController => _mapsController;
@@ -30,7 +32,10 @@ class Geolocalizacao extends ChangeNotifier {
         Marker(
           markerId: MarkerId(local.nome),
           position: LatLng(local.latitude, local.longitude),
-          onTap: () {},
+          onTap: () {
+            marcadorSelecionado = LatLng(local.latitude, local.longitude);
+            notifyListeners(); // vai acionar o botão flutuante
+          },
         ),
       );
     }
@@ -40,13 +45,13 @@ class Geolocalizacao extends ChangeNotifier {
   /// Retorna LatLng da posição atual ou lança exceção
   Future<LatLng> getPosicao() async {
     try {
-      debugPrint("[Geolocalizacao] Obtendo posição atual...");
+      debugPrint("Obtendo posição atual...");
       Position posicao = await _posicaoAtual();
       lat = posicao.latitude;
       long = posicao.longitude;
 
       LatLng atual = LatLng(lat, long);
-      debugPrint("[Geolocalizacao] Posição atual: $atual");
+      debugPrint("Posição atual: $atual");
 
       _mapsController.animateCamera(CameraUpdate.newLatLng(atual));
       notifyListeners();
@@ -54,7 +59,7 @@ class Geolocalizacao extends ChangeNotifier {
       return atual;
     } catch (e) {
       erro = e.toString();
-      debugPrint("[Geolocalizacao] Erro ao obter posição: $erro");
+      debugPrint("Erro ao obter posição: $erro");
       throw Exception(erro); // lança exceção para botão capturar
     }
   }
@@ -82,6 +87,10 @@ class Geolocalizacao extends ChangeNotifier {
     return await Geolocator.getCurrentPosition();
   }
 
+  void atualizar() {
+    notifyListeners();
+  }
+
   /// Adiciona marcador no mapa
   void addDestino(LatLng destino, String nome) {
     markers.add(
@@ -97,7 +106,7 @@ class Geolocalizacao extends ChangeNotifier {
   /// Vai para o destino no mapa
   void irParaDestino(LatLng destino) {
     this.destino = destino;
-    _mapsController.animateCamera(CameraUpdate.newLatLngZoom(destino, 15));
+    _mapsController.animateCamera(CameraUpdate.newLatLngZoom(destino, 17.5));
     notifyListeners();
   }
 }

@@ -36,7 +36,7 @@ class Trajetoria extends ChangeNotifier {
       // Adiciona polyline no mapa
       final polyline = Polyline(
         polylineId: PolylineId("rota"),
-        color: const Color(0xFF4285F4),
+        color: const Color(0xFF00BCF4),
         width: 6,
         points: polylineCoordinates,
       );
