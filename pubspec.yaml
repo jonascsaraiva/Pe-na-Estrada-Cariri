@@ -31,6 +31,9 @@ dependencies:
   flutter:
     sdk: flutter
   provider: ^5.0.0
+
+  # Banco Local String
+  shared_preferences: ^2.0.6
   
   curved_navigation_bar: ^1.0.6
   # The following adds the Cupertino Icons font to your application.
@@ -62,7 +65,9 @@ dev_dependencies:
 # The following section is specific to Flutter packages.
 flutter:
   assets:
-    - assets\map_style.json
+    - assets\mapstyles\map_style.json
+    - assets\mapstyles\map_style_dark.json
+    - assets\mapstyles\map_style_light.json
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
@@ -84,10 +89,10 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
+  fonts:
+    - family: PlayfairDisplay
+      fonts:
+        - asset: assets\playfair-display-font\PlayfairDisplayRegular-ywLOY.ttf
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic
   #   - family: Trajan Pro

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:pe_na_estrada_cariri/controllers/darkmode.dart';
 import 'package:pe_na_estrada_cariri/controllers/geolocalizacao.dart';
 import 'package:pe_na_estrada_cariri/controllers/trajetoria.dart';
 import 'package:pe_na_estrada_cariri/pages/detailpages/detail_list.dart';
@@ -23,18 +24,11 @@ class _MapPageState extends State<MapPage> {
   @override
   void initState() {
     super.initState();
-
-    _loadMapStyle();
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final geo = context.read<Geolocalizacao>();
-
-      geo.getPosicao(); // sempre atualiza a posição atual
-
+      geo.getPosicao();
       if (widget.destino != null) {
         geo.addDestino(widget.destino!, widget.destinoNome ?? "Destino");
-
-        // centraliza no destino
         Future.delayed(const Duration(milliseconds: 500), () {
           _mapController?.animateCamera(
             CameraUpdate.newLatLngZoom(widget.destino!, 17),
@@ -44,17 +38,27 @@ class _MapPageState extends State<MapPage> {
     });
   }
 
-  Future<void> _loadMapStyle() async {
-    final style = await rootBundle.loadString('assets/map_style.json');
-    setState(() {
-      _mapStyle = style;
-    });
+  Future<void> _loadMapStyle(BuildContext context) async {
+    final themeSettings = Provider.of<ThemeSettings>(context, listen: false);
+    if (themeSettings.isDark) {
+      final style = await rootBundle.loadString(
+        'assets/mapstyles/map_style_dark.json',
+      );
+      setState(() => _mapStyle = style);
+    } else {
+      setState(() => _mapStyle = null);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer2<Geolocalizacao, Trajetoria>(
-      builder: (context, geo, traj, child) {
+    return Consumer3<Geolocalizacao, Trajetoria, ThemeSettings>(
+      builder: (context, geo, traj, theme, child) {
+        // Atualiza mapa se tema mudar
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _loadMapStyle(context);
+        });
+
         return Stack(
           children: [
             GoogleMap(
@@ -64,9 +68,6 @@ class _MapPageState extends State<MapPage> {
               },
               style: _mapStyle,
               markers: geo.markers,
-              onTap: (LatLng pos) {
-                geo.limparSelecao();
-              },
               polylines: traj.polylines,
               initialCameraPosition: CameraPosition(
                 target: LatLng(geo.lat, geo.long),
@@ -75,9 +76,7 @@ class _MapPageState extends State<MapPage> {
               myLocationEnabled: true,
               myLocationButtonEnabled: false,
               zoomControlsEnabled: false,
-              mapType: MapType.normal,
             ),
-
             // botão localização
             Positioned(
               bottom: 20,
