@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:pe_na_estrada_cariri/models/localizacoes.dart';
 import 'package:pe_na_estrada_cariri/repositories/loc_repository.dart';
 
 class Geolocalizacao extends ChangeNotifier {
@@ -11,38 +12,43 @@ class Geolocalizacao extends ChangeNotifier {
   LatLng? destino;
 
   Set<Marker> markers = {};
-  LatLng? marcadorSelecionado;
+  Localizacoes? marcadorSelecionado;
 
   late GoogleMapController _mapsController;
 
   get mapsController => _mapsController;
 
-  /// Inicializa o mapa e carrega os postos
+  // Inicializa o mapa e carrega os postos
   onMapCreated(GoogleMapController gmc) async {
     _mapsController = gmc;
     await getPosicao(); // pega posição inicial
     loadPostos(); // carrega marcadores
   }
 
-  /// Carrega marcadores do repositório
-  loadPostos() async {
+  // Carrega marcadores fixos do repositório
+  Future<void> loadPostos() async {
+    markers.clear(); // garante que não duplica
+
     final localizacoes = LocRepository().localizacoes;
+
     for (var local in localizacoes) {
       markers.add(
         Marker(
           markerId: MarkerId(local.nome),
           position: LatLng(local.latitude, local.longitude),
+
           onTap: () {
-            marcadorSelecionado = LatLng(local.latitude, local.longitude);
-            notifyListeners(); // vai acionar o botão flutuante
+            marcadorSelecionado = local;
+            notifyListeners();
           },
         ),
       );
     }
+
     notifyListeners();
   }
 
-  /// Retorna LatLng da posição atual ou lança exceção
+  // Retorna LatLng da posição atual ou lança exceção
   Future<LatLng> getPosicao() async {
     try {
       debugPrint("Obtendo posição atual...");
@@ -64,7 +70,7 @@ class Geolocalizacao extends ChangeNotifier {
     }
   }
 
-  /// Verifica permissões e retorna posição do GPS
+  // Verifica permissões e retorna posição do GPS
   Future<Position> _posicaoAtual() async {
     LocationPermission permissao;
     bool ativado = await Geolocator.isLocationServiceEnabled();
@@ -91,22 +97,29 @@ class Geolocalizacao extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Adiciona marcador no mapa
+  // Define destino sem adicionar marcador extra
   void addDestino(LatLng destino, String nome) {
-    markers.add(
-      Marker(
-        markerId: MarkerId(nome),
-        position: destino,
-        infoWindow: InfoWindow(title: nome),
-      ),
+    marcadorSelecionado = Localizacoes(
+      nome: nome,
+      latitude: destino.latitude,
+      longitude: destino.longitude,
+      endereco: '',
+      foto: '',
+      descricao: '',
     );
     notifyListeners();
   }
 
-  /// Vai para o destino no mapa
+  // Vai para o destino no mapa
   void irParaDestino(LatLng destino) {
     this.destino = destino;
     _mapsController.animateCamera(CameraUpdate.newLatLngZoom(destino, 17.5));
+    notifyListeners();
+  }
+
+  // Vai para o destino no mapa
+  void limparSelecao() {
+    marcadorSelecionado = null;
     notifyListeners();
   }
 }

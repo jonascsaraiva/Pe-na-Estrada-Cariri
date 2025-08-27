@@ -42,6 +42,7 @@ class _ListPageState extends State<ListPage> {
                   decoration: InputDecoration(
                     hintText: 'Pesquisar',
                     prefixIcon: const Icon(Icons.search),
+
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
