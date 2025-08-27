@@ -65,7 +65,6 @@ dev_dependencies:
 # The following section is specific to Flutter packages.
 flutter:
   assets:
-    - assets\mapstyles\map_style.json
     - assets\mapstyles\map_style_dark.json
     - assets\mapstyles\map_style_light.json
 

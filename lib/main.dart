@@ -3,6 +3,8 @@ import 'package:pe_na_estrada_cariri/controllers/darkmode.dart';
 import 'package:pe_na_estrada_cariri/controllers/trajetoria.dart';
 import 'package:pe_na_estrada_cariri/home_page.dart';
 import 'package:pe_na_estrada_cariri/controllers/geolocalizacao.dart';
+import 'package:pe_na_estrada_cariri/theme/dark_theme.dart';
+import 'package:pe_na_estrada_cariri/theme/light_theme.dart';
 import 'package:provider/provider.dart';
 
 Future<void> main() async {
@@ -26,15 +28,10 @@ class MyApp extends StatelessWidget {
           return MaterialApp(
             title: 'Pé na estrada Cariri',
             debugShowCheckedModeBanner: false,
-            theme: ThemeData(
-              primarySwatch: Colors.cyan,
-              fontFamily: 'PlayfairDisplay',
-              brightness: Brightness.light,
-            ),
-            darkTheme: ThemeData(
-              brightness: Brightness.dark,
-              fontFamily: 'PlayfairDisplay',
-            ),
+            // Tema claro externo
+            theme: AppThemeLight.theme,
+            //  Tema escuro externo
+            darkTheme: AppThemeDark.theme,
             themeMode: themeSettings.isDark ? ThemeMode.dark : ThemeMode.light,
             home: const HomePage(),
           );

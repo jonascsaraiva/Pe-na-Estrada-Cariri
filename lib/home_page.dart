@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:pe_na_estrada_cariri/controllers/geolocalizacao.dart';
 import 'package:pe_na_estrada_cariri/pages/config_page.dart';
 import 'package:pe_na_estrada_cariri/pages/list_page.dart';
-
 import 'package:pe_na_estrada_cariri/pages/fav_page.dart';
 import 'package:pe_na_estrada_cariri/pages/map_page.dart';
+import 'package:pe_na_estrada_cariri/theme/dark_theme.dart';
+import 'package:pe_na_estrada_cariri/theme/light_theme.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
@@ -17,18 +18,13 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
-  void mudarAba(int index) {
-    setState(() => _selectedIndex = index);
-  }
 
-  /// Páginas que vão aparecer no corpo
   final List<Widget> _pages = const [
     Center(child: ListPage()),
     Center(child: MapPage()),
     Center(child: FavPage()),
   ];
 
-  /// Ícones e rótulos para o BottomNavigation
   final List<IconData> _icons = const [
     Icons.add_location_alt,
     Icons.map_outlined,
@@ -43,12 +39,12 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Consumer<Geolocalizacao>(
       builder: (context, geo, _) {
-        // Se houver destino definido no Geolocalizacao, muda para aba do mapa automaticamente.
         if (geo.destino != null && _selectedIndex != 1) {
           _selectedIndex = 1;
-          // Chama a função para centralizar no destino
           geo.irParaDestino(geo.destino!);
           geo.destino = null;
         }
@@ -58,8 +54,10 @@ class _HomePageState extends State<HomePage> {
             child: Column(
               children: [
                 DrawerHeader(
-                  decoration: BoxDecoration(color: Colors.cyan),
-                  child: Center(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).primaryColor,
+                  ),
+                  child: const Center(
                     child: Text(
                       'Menu',
                       style: TextStyle(
@@ -78,7 +76,9 @@ class _HomePageState extends State<HomePage> {
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => ConfigPage()),
+                      MaterialPageRoute(
+                        builder: (context) => const ConfigPage(),
+                      ),
                     );
                   },
                 ),
@@ -86,28 +86,37 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           appBar: AppBar(
-            toolbarHeight: 60,
-            title: Text(
-              _titles[_selectedIndex],
-              style: const TextStyle(
-                fontWeight: FontWeight.w700,
-                color: Colors.white,
-                fontSize: 33,
-              ),
-            ),
-            centerTitle: true,
-            backgroundColor: Colors.cyan,
+            title: Text(_titles[_selectedIndex]),
+            toolbarHeight: 55,
           ),
           body: IndexedStack(index: _selectedIndex, children: _pages),
           bottomNavigationBar: CurvedNavigationBar(
-            height: 60,
+            height: 55,
             animationDuration: Durations.medium4,
-            color: Colors.cyan,
-            buttonBackgroundColor: Colors.cyan,
-            backgroundColor: Colors.transparent,
+            color: isDark
+                ? AppThemeDark.curvedButton
+                : AppThemeLight.curvedButton,
+            buttonBackgroundColor: isDark
+                ? AppThemeDark.curvedButton
+                : AppThemeLight.curvedButton,
+            backgroundColor: isDark
+                ? AppThemeDark.curvedBackground
+                : AppThemeLight.curvedBackground,
             index: _selectedIndex,
             items: _icons
-                .map((icon) => Icon(icon, size: 30, color: Colors.white))
+                .map(
+                  (icon) => Icon(
+                    icon,
+                    size: 30,
+                    color: _selectedIndex == _icons.indexOf(icon)
+                        ? (isDark
+                              ? AppThemeDark.curvedIconSelected
+                              : AppThemeLight.curvedIconSelected)
+                        : (isDark
+                              ? AppThemeDark.curvedIconUnselected
+                              : AppThemeLight.curvedIconUnselected),
+                  ),
+                )
                 .toList(),
             onTap: _onItemTapped,
           ),

@@ -5,6 +5,8 @@ import 'package:pe_na_estrada_cariri/controllers/darkmode.dart';
 import 'package:pe_na_estrada_cariri/controllers/geolocalizacao.dart';
 import 'package:pe_na_estrada_cariri/controllers/trajetoria.dart';
 import 'package:pe_na_estrada_cariri/pages/detailpages/detail_list.dart';
+import 'package:pe_na_estrada_cariri/theme/dark_theme.dart';
+import 'package:pe_na_estrada_cariri/theme/light_theme.dart';
 import 'package:provider/provider.dart';
 
 class MapPage extends StatefulWidget {
@@ -40,18 +42,24 @@ class _MapPageState extends State<MapPage> {
 
   Future<void> _loadMapStyle(BuildContext context) async {
     final themeSettings = Provider.of<ThemeSettings>(context, listen: false);
+
     if (themeSettings.isDark) {
       final style = await rootBundle.loadString(
         'assets/mapstyles/map_style_dark.json',
       );
       setState(() => _mapStyle = style);
     } else {
-      setState(() => _mapStyle = null);
+      final style = await rootBundle.loadString(
+        'assets/mapstyles/map_style_light.json',
+      );
+      setState(() => _mapStyle = style);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Consumer3<Geolocalizacao, Trajetoria, ThemeSettings>(
       builder: (context, geo, traj, theme, child) {
         // Atualiza mapa se tema mudar
@@ -81,23 +89,32 @@ class _MapPageState extends State<MapPage> {
             Positioned(
               bottom: 20,
               right: 20,
-              // left: MediaQuery.of(context).size.width / 2 - 1,
               child: Column(
                 children: [
-                  // Botão Localização
                   FloatingActionButton(
                     heroTag: "btnLocalizacao",
                     mini: true,
                     onPressed: () => geo.getPosicao(),
+                    backgroundColor: isDark
+                        ? AppThemeDark.curvedButton
+                        : AppThemeLight.curvedButton,
+                    foregroundColor: isDark
+                        ? AppThemeDark.curvedIconSelected
+                        : AppThemeLight.curvedIconSelected,
                     child: const Icon(Icons.my_location),
                   ),
-                  Divider(height: 5),
-                  // Botões de zoom in/out
+                  const SizedBox(height: 5),
                   FloatingActionButton(
                     heroTag: "btnZoomIn",
                     mini: true,
                     onPressed: () =>
                         _mapController?.animateCamera(CameraUpdate.zoomIn()),
+                    backgroundColor: isDark
+                        ? AppThemeDark.curvedButton
+                        : AppThemeLight.curvedButton,
+                    foregroundColor: isDark
+                        ? AppThemeDark.curvedIconSelected
+                        : AppThemeLight.curvedIconSelected,
                     child: const Icon(Icons.add),
                   ),
                   const SizedBox(height: 5),
@@ -106,20 +123,25 @@ class _MapPageState extends State<MapPage> {
                     mini: true,
                     onPressed: () =>
                         _mapController?.animateCamera(CameraUpdate.zoomOut()),
+                    backgroundColor: isDark
+                        ? AppThemeDark.curvedButton
+                        : AppThemeLight.curvedButton,
+                    foregroundColor: isDark
+                        ? AppThemeDark.curvedIconSelected
+                        : AppThemeLight.curvedIconSelected,
                     child: const Icon(Icons.remove),
                   ),
                 ],
               ),
             ),
 
-            // Botões que aparecem ao clicar em qualquer marcador.
+            // Botões de marcador
             if (geo.marcadorSelecionado != null)
               Positioned(
                 bottom: 20,
                 left: 20,
                 child: Row(
                   children: [
-                    // Botão de Rota
                     FloatingActionButton.extended(
                       heroTag: "btnRotas",
                       onPressed: () async {
@@ -146,14 +168,18 @@ class _MapPageState extends State<MapPage> {
                       },
                       label: const Text("Como chegar"),
                       icon: const Icon(Icons.directions),
+                      backgroundColor: isDark
+                          ? AppThemeDark.curvedButton
+                          : AppThemeLight.curvedButton,
+                      foregroundColor: isDark
+                          ? AppThemeDark.curvedIconSelected
+                          : AppThemeLight.curvedIconSelected,
                     ),
                     const SizedBox(width: 15),
-                    // Botão Saber sobre
                     FloatingActionButton.extended(
                       heroTag: "btnDetalhes",
                       onPressed: () {
                         if (!context.mounted) return;
-
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -164,6 +190,12 @@ class _MapPageState extends State<MapPage> {
                       },
                       label: const Text("Saber sobre"),
                       icon: const Icon(Icons.info),
+                      backgroundColor: isDark
+                          ? AppThemeDark.curvedButton
+                          : AppThemeLight.curvedButton,
+                      foregroundColor: isDark
+                          ? AppThemeDark.curvedIconSelected
+                          : AppThemeLight.curvedIconSelected,
                     ),
                   ],
                 ),

@@ -11,14 +11,10 @@ class DetailList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 60,
-        title: const Text('Informações'),
-        backgroundColor: Colors.cyan,
-        titleTextStyle: const TextStyle(color: Colors.white, fontSize: 33),
-        iconTheme: const IconThemeData(color: Colors.white),
-      ),
+      appBar: AppBar(toolbarHeight: 55, title: const Text('Informações')),
       body: ListView(
         children: [
           AspectRatio(
@@ -32,22 +28,25 @@ class DetailList extends StatelessWidget {
               children: [
                 Text(
                   loc.nome,
-                  style: const TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w800,
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.w900,
                   ),
                 ),
                 const SizedBox(height: 10),
                 Text(
                   loc.endereco,
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w500,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w800,
                   ),
                 ),
                 const SizedBox(height: 15),
                 if (loc.descricao != null)
-                  Text(loc.descricao!, style: const TextStyle(fontSize: 20)),
+                  Text(
+                    loc.descricao!,
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
                 const SizedBox(height: 15),
                 const Divider(height: 15),
                 Row(
@@ -55,7 +54,6 @@ class DetailList extends StatelessWidget {
                     Expanded(
                       child: OutlinedButton.icon(
                         onPressed: () {
-                          // Apenas move o mapa para o destino
                           context.read<Geolocalizacao>().irParaDestino(
                             LatLng(loc.latitude, loc.longitude),
                           );
@@ -69,41 +67,24 @@ class DetailList extends StatelessWidget {
                     Expanded(
                       child: OutlinedButton.icon(
                         onPressed: () async {
-                          debugPrint("Iniciando geração de rota...");
                           final geo = context.read<Geolocalizacao>();
                           final trajetoria = context.read<Trajetoria>();
                           final messenger = ScaffoldMessenger.of(context);
 
                           try {
-                            debugPrint("Obtendo posição atual...");
                             final origem = await geo.getPosicao();
-
-                            debugPrint("Posição atual: $origem");
-
                             final destino = LatLng(loc.latitude, loc.longitude);
-                            debugPrint("Destino: $destino");
 
-                            debugPrint("Criando rota no mapa...");
                             await trajetoria.criarRota(origem, destino);
-                            debugPrint("Rota criada com sucesso!");
-
-                            debugPrint("Adicionando marcador de destino...");
                             geo.addDestino(destino, loc.nome);
-
-                            // Define o destino para o Consumer do HomePage
                             geo.destino = destino;
-                            geo.irParaDestino(destino); // centraliza no mapa
+                            geo.irParaDestino(destino);
 
-                            debugPrint("Voltando para a aba do mapa...");
                             Navigator.of(
                               // ignore: use_build_context_synchronously
                               context,
                             ).popUntil((route) => route.isFirst);
-                            debugPrint("Navegação concluída!");
-                          } catch (e, stack) {
-                            debugPrint("Falha ao gerar rota: $e");
-                            debugPrint("Stacktrace: $stack");
-
+                          } catch (e) {
                             messenger.showSnackBar(
                               SnackBar(content: Text('Erro ao gerar rota: $e')),
                             );

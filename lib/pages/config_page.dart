@@ -18,25 +18,23 @@ class _ConfigPageState extends State<ConfigPage> {
         title: const Text(
           'Configurações',
           textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 25,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
+          style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
         ),
-        iconTheme: const IconThemeData(color: Colors.white),
-        backgroundColor: const Color.fromARGB(255, 0, 187, 212),
-        toolbarHeight: 60,
+        toolbarHeight: 55,
       ),
       body: ListView(
         children: [
           SwitchListTile(
-            title: const Text('Tema Escuro'),
+            title: const Text(
+              'Tema Escuro',
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+            ),
             value: themeSettings.isDark,
             onChanged: (value) async {
-              await themeSettings.setDark(value); // Atualiza instantaneamente
+              await themeSettings.setDark(value);
             },
           ),
+          Divider(height: 0.1),
         ],
       ),
     );

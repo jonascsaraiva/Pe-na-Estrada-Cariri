@@ -60,9 +60,7 @@ class _ListPageState extends State<ListPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: const Color.fromARGB(255, 138, 138, 138),
-                  ),
+                  border: Border.all(color: Colors.white),
                 ),
                 child: DropdownButton<String>(
                   value: sortOrder,
@@ -91,7 +89,7 @@ class _ListPageState extends State<ListPage> {
             ],
           ),
         ),
-        Divider(height: 1),
+
         // Lista dos blocos
         Expanded(
           child: GridView.builder(
@@ -125,11 +123,11 @@ class _ListPageState extends State<ListPage> {
                       Container(
                         alignment: Alignment.bottomCenter,
                         padding: const EdgeInsets.all(6),
-                        color: Colors.black54,
+                        //Efeito aplicado a imagem da lista, deixando ela um pouco mais escura.
+                        color: const Color.fromARGB(110, 0, 0, 0),
                         child: Text(
                           loc.nome,
                           style: const TextStyle(
-                            color: Colors.white,
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
                           ),
