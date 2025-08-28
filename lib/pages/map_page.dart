@@ -84,7 +84,11 @@ class _MapPageState extends State<MapPage> {
               myLocationEnabled: true,
               myLocationButtonEnabled: false,
               zoomControlsEnabled: false,
+              onTap: (_) {
+                geo.limparSelecao();
+              },
             ),
+
             // botão localização
             Positioned(
               bottom: 20,
@@ -176,7 +180,6 @@ class _MapPageState extends State<MapPage> {
                               );
                             }
                           });
-
                           geo.marcadorSelecionado = null;
                           geo.atualizar();
                         } catch (e) {

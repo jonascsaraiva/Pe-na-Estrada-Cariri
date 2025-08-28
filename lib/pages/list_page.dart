@@ -1,6 +1,8 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:pe_na_estrada_cariri/pages/detailpages/detail_list.dart';
 import 'package:pe_na_estrada_cariri/repositories/loc_repository.dart';
+import 'package:pe_na_estrada_cariri/theme/shimmerplaceholder.dart';
 
 class ListPage extends StatefulWidget {
   const ListPage({super.key});
@@ -15,10 +17,38 @@ class _ListPageState extends State<ListPage> {
   String searchQuery = '';
   String sortOrder = 'A–Z';
 
+  // Controle de paginação interna
+  final int chunkSize = 20; // quantos itens carregar por vez
+  int currentMax = 20;
+
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels ==
+          _scrollController.position.maxScrollExtent) {
+        // Chegou no fim da lista, carrega mais itens
+        setState(() {
+          currentMax = (currentMax + chunkSize).clamp(0, filtered.length);
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  late List filtered;
+
   @override
   Widget build(BuildContext context) {
     // aplica filtro pelo nome
-    List filtered = repo.localizacoes
+    filtered = repo.localizacoes
         .where(
           (loc) => loc.nome.toLowerCase().contains(searchQuery.toLowerCase()),
         )
@@ -30,19 +60,20 @@ class _ListPageState extends State<ListPage> {
       return sortOrder == 'A–Z' ? cmp : -cmp;
     });
 
+    // Limita a quantidade de itens mostrados
+    final itemsToShow = filtered.take(currentMax).toList();
+
     return Column(
       children: [
         Padding(
           padding: const EdgeInsets.all(8),
           child: Row(
             children: [
-              // Barra de busca aqui
               Expanded(
                 child: TextField(
                   decoration: InputDecoration(
                     hintText: 'Pesquisar',
                     prefixIcon: const Icon(Icons.search),
-
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -50,12 +81,12 @@ class _ListPageState extends State<ListPage> {
                   onChanged: (value) {
                     setState(() {
                       searchQuery = value;
+                      currentMax = chunkSize; // resetar chunks ao filtrar
                     });
                   },
                 ),
               ),
               const SizedBox(width: 7),
-              // Dropdow de ordenação aqui
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 decoration: BoxDecoration(
@@ -81,6 +112,7 @@ class _ListPageState extends State<ListPage> {
                     if (value != null) {
                       setState(() {
                         sortOrder = value;
+                        currentMax = chunkSize; // resetar chunks
                       });
                     }
                   },
@@ -89,21 +121,20 @@ class _ListPageState extends State<ListPage> {
             ],
           ),
         ),
-
-        // Lista dos blocos
         Expanded(
           child: GridView.builder(
+            controller: _scrollController,
             padding: const EdgeInsets.all(6),
-            //Aqui estiliza os blocos da lista
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
               crossAxisSpacing: 7,
               mainAxisSpacing: 7,
               childAspectRatio: 1.6,
             ),
-            itemCount: filtered.length,
+            cacheExtent: 1111, // mais itens pré-carregados
+            itemCount: itemsToShow.length,
             itemBuilder: (context, index) {
-              final loc = filtered[index];
+              final loc = itemsToShow[index];
               return InkWell(
                 onTap: () {
                   Navigator.push(
@@ -119,11 +150,16 @@ class _ListPageState extends State<ListPage> {
                   child: Stack(
                     fit: StackFit.expand,
                     children: [
-                      Image.network(loc.foto, fit: BoxFit.fill),
+                      CachedNetworkImage(
+                        imageUrl: loc.foto,
+                        placeholder: (context, url) => shimmerPlaceholder(),
+                        errorWidget: (context, url, error) =>
+                            const Icon(Icons.error),
+                        fit: BoxFit.fill,
+                      ),
                       Container(
                         alignment: Alignment.bottomCenter,
                         padding: const EdgeInsets.all(6),
-                        //Efeito aplicado a imagem da lista, deixando ela um pouco mais escura.
                         color: const Color.fromARGB(110, 0, 0, 0),
                         child: Text(
                           loc.nome,

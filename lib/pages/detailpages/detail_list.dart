@@ -3,7 +3,9 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:pe_na_estrada_cariri/controllers/geolocalizacao.dart';
 import 'package:pe_na_estrada_cariri/controllers/trajetoria.dart';
 import 'package:pe_na_estrada_cariri/models/localizacoes.dart';
+import 'package:pe_na_estrada_cariri/theme/shimmerplaceholder.dart';
 import 'package:provider/provider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class DetailList extends StatelessWidget {
   final Localizacoes loc;
@@ -19,7 +21,13 @@ class DetailList extends StatelessWidget {
         children: [
           AspectRatio(
             aspectRatio: 16 / 9,
-            child: Image.network(loc.foto, fit: BoxFit.cover),
+            child: CachedNetworkImage(
+              imageUrl: loc.foto,
+              placeholder: (context, url) => shimmerPlaceholder(),
+              errorWidget: (context, url, error) =>
+                  const Icon(Icons.error, size: 50),
+              fit: BoxFit.cover,
+            ),
           ),
           Padding(
             padding: const EdgeInsets.all(20),
@@ -82,7 +90,7 @@ class DetailList extends StatelessWidget {
                             geo.destino = destino;
                             geo.irParaDestino(destino);
 
-                            // inicia stream para atualizar em tempo real
+                            // inicia stream para atualização em tempo real
                             geo.iniciarStreamPosicao((posAtual) {
                               if (traj.navegando && geo.destino != null) {
                                 traj.atualizarRota(posAtual, geo.destino!);
@@ -100,7 +108,6 @@ class DetailList extends StatelessWidget {
                             );
                           }
                         },
-
                         icon: const Icon(Icons.directions),
                         label: const Text('Como chegar'),
                       ),

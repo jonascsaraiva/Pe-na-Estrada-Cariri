@@ -116,7 +116,11 @@ class Geolocalizacao extends ChangeNotifier {
   void irParaDestino(LatLng destino) {
     this.destino = destino;
     _mapsController.animateCamera(CameraUpdate.newLatLngZoom(destino, 17.5));
-    notifyListeners();
+
+    // adia o notifyListeners para o próximo frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      notifyListeners();
+    });
   }
 
   // Vai para o destino no mapa
@@ -133,7 +137,7 @@ class Geolocalizacao extends ChangeNotifier {
         Geolocator.getPositionStream(
           locationSettings: const LocationSettings(
             accuracy: LocationAccuracy.bestForNavigation,
-            distanceFilter: 3, // atualiza a cada 3 metros
+            distanceFilter: 5, // atualiza a cada 5 metros
           ),
         ).listen((pos) {
           final atual = LatLng(pos.latitude, pos.longitude);
@@ -149,14 +153,14 @@ class Geolocalizacao extends ChangeNotifier {
     _posicaoStream = null;
   }
 
-  void centralizarCameraNavegacao(LatLng atual) {
+  void centralizarCameraNavegacao(LatLng atual, {double bearing = 0}) {
     _mapsController.animateCamera(
       CameraUpdate.newCameraPosition(
         CameraPosition(
           target: atual,
-          zoom: 17.5,
-          tilt: 45, // inclina para dar sensação de navegação
-          bearing: 0, // depois você pode usar direção do movimento
+          zoom: 19.5,
+          tilt: 60,
+          bearing: 0, // agora é flexível
         ),
       ),
     );
