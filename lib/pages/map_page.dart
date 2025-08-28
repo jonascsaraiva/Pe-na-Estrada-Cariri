@@ -142,32 +142,54 @@ class _MapPageState extends State<MapPage> {
                 left: 20,
                 child: Row(
                   children: [
+                    // dentro do Row dos botões de marcador, substitua o atual "Como Chegar" por isso:
                     FloatingActionButton.extended(
                       heroTag: "btnRotas",
                       onPressed: () async {
-                        final origem = await geo.getPosicao();
-                        final destino = LatLng(
-                          geo.marcadorSelecionado!.latitude,
-                          geo.marcadorSelecionado!.longitude,
-                        );
+                        final geo = context.read<Geolocalizacao>();
+                        final trajetoria = context.read<Trajetoria>();
 
-                        if (!context.mounted) return;
+                        try {
+                          final origem = await geo.getPosicao();
+                          final destino = LatLng(
+                            geo.marcadorSelecionado!.latitude,
+                            geo.marcadorSelecionado!.longitude,
+                          );
 
-                        await context.read<Trajetoria>().criarRota(
-                          origem,
-                          destino,
-                        );
-                        geo.addDestino(destino, geo.marcadorSelecionado!.nome);
+                          await trajetoria.criarRota(origem, destino);
+                          geo.addDestino(
+                            destino,
+                            geo.marcadorSelecionado!.nome,
+                          );
+                          geo.destino = destino;
+                          trajetoria.iniciarNavegacao();
 
-                        _mapController?.animateCamera(
-                          CameraUpdate.newLatLngZoom(destino, 17),
-                        );
+                          // inicia stream de posição para atualizar a rota dinamicamente
+                          geo.iniciarStreamPosicao((atual) async {
+                            geo.centralizarCameraNavegacao(
+                              atual,
+                            ); // centraliza camera
+                            if (trajetoria.navegando && geo.destino != null) {
+                              await trajetoria.atualizarRota(
+                                atual,
+                                geo.destino!,
+                              );
+                            }
+                          });
 
-                        geo.marcadorSelecionado = null;
-                        geo.atualizar();
+                          geo.marcadorSelecionado = null;
+                          geo.atualizar();
+                        } catch (e) {
+                          // ignore: use_build_context_synchronously
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Erro ao gerar rota: $e')),
+                          );
+                        }
                       },
-                      label: const Text("Como chegar"),
-                      icon: const Icon(Icons.directions),
+                      label: Text(traj.navegando ? "Parar" : "Como chegar"),
+                      icon: Icon(
+                        traj.navegando ? Icons.close : Icons.directions,
+                      ),
                       backgroundColor: isDark
                           ? AppThemeDark.curvedButton
                           : AppThemeLight.curvedButton,
@@ -175,6 +197,7 @@ class _MapPageState extends State<MapPage> {
                           ? AppThemeDark.curvedIconSelected
                           : AppThemeLight.curvedIconSelected,
                     ),
+
                     const SizedBox(width: 15),
                     FloatingActionButton.extended(
                       heroTag: "btnDetalhes",

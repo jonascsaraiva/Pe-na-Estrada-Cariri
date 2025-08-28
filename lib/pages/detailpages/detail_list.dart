@@ -68,17 +68,27 @@ class DetailList extends StatelessWidget {
                       child: OutlinedButton.icon(
                         onPressed: () async {
                           final geo = context.read<Geolocalizacao>();
-                          final trajetoria = context.read<Trajetoria>();
+                          final traj = context.read<Trajetoria>();
                           final messenger = ScaffoldMessenger.of(context);
 
                           try {
                             final origem = await geo.getPosicao();
                             final destino = LatLng(loc.latitude, loc.longitude);
 
-                            await trajetoria.criarRota(origem, destino);
+                            await traj.criarRota(origem, destino);
+                            traj.iniciarNavegacao();
+
                             geo.addDestino(destino, loc.nome);
                             geo.destino = destino;
                             geo.irParaDestino(destino);
+
+                            // inicia stream para atualizar em tempo real
+                            geo.iniciarStreamPosicao((posAtual) {
+                              if (traj.navegando && geo.destino != null) {
+                                traj.atualizarRota(posAtual, geo.destino!);
+                                geo.centralizarCameraNavegacao(posAtual);
+                              }
+                            });
 
                             Navigator.of(
                               // ignore: use_build_context_synchronously
@@ -90,6 +100,7 @@ class DetailList extends StatelessWidget {
                             );
                           }
                         },
+
                         icon: const Icon(Icons.directions),
                         label: const Text('Como chegar'),
                       ),

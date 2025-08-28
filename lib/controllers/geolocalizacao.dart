@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -121,5 +123,42 @@ class Geolocalizacao extends ChangeNotifier {
   void limparSelecao() {
     marcadorSelecionado = null;
     notifyListeners();
+  }
+
+  StreamSubscription<Position>? _posicaoStream;
+
+  void iniciarStreamPosicao(void Function(LatLng) onUpdate) {
+    _posicaoStream?.cancel();
+    _posicaoStream =
+        Geolocator.getPositionStream(
+          locationSettings: const LocationSettings(
+            accuracy: LocationAccuracy.bestForNavigation,
+            distanceFilter: 3, // atualiza a cada 3 metros
+          ),
+        ).listen((pos) {
+          final atual = LatLng(pos.latitude, pos.longitude);
+          lat = pos.latitude;
+          long = pos.longitude;
+          notifyListeners();
+          onUpdate(atual);
+        });
+  }
+
+  void pararStreamPosicao() {
+    _posicaoStream?.cancel();
+    _posicaoStream = null;
+  }
+
+  void centralizarCameraNavegacao(LatLng atual) {
+    _mapsController.animateCamera(
+      CameraUpdate.newCameraPosition(
+        CameraPosition(
+          target: atual,
+          zoom: 17.5,
+          tilt: 45, // inclina para dar sensação de navegação
+          bearing: 0, // depois você pode usar direção do movimento
+        ),
+      ),
+    );
   }
 }
