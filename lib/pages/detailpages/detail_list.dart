@@ -78,6 +78,7 @@ class DetailList extends StatelessWidget {
                           final geo = context.read<Geolocalizacao>();
                           final traj = context.read<Trajetoria>();
                           final messenger = ScaffoldMessenger.of(context);
+                          final trajetoria = context.read<Trajetoria>();
 
                           try {
                             final origem = await geo.getPosicao();
@@ -91,10 +92,19 @@ class DetailList extends StatelessWidget {
                             geo.irParaDestino(destino);
 
                             // inicia stream para atualização em tempo real
-                            geo.iniciarStreamPosicao((posAtual) {
-                              if (traj.navegando && geo.destino != null) {
-                                traj.atualizarRota(posAtual, geo.destino!);
-                                geo.centralizarCameraNavegacao(posAtual);
+                            geo.iniciarStreamPosicao(trajetoria, (
+                              posAtual,
+                              heading,
+                            ) {
+                              if (trajetoria.navegando && geo.destino != null) {
+                                trajetoria.atualizarRota(
+                                  posAtual,
+                                  geo.destino!,
+                                );
+                                geo.centralizarCameraNavegacao(
+                                  posAtual,
+                                  bearing: heading,
+                                );
                               }
                             });
 

@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -22,6 +24,7 @@ class MapPage extends StatefulWidget {
 class _MapPageState extends State<MapPage> {
   GoogleMapController? _mapController;
   String? _mapStyle;
+  bool _showCentralizarBtn = false;
 
   @override
   void initState() {
@@ -42,7 +45,6 @@ class _MapPageState extends State<MapPage> {
 
   Future<void> _loadMapStyle(BuildContext context) async {
     final themeSettings = Provider.of<ThemeSettings>(context, listen: false);
-
     if (themeSettings.isDark) {
       final style = await rootBundle.loadString(
         'assets/mapstyles/map_style_dark.json',
@@ -62,7 +64,6 @@ class _MapPageState extends State<MapPage> {
 
     return Consumer3<Geolocalizacao, Trajetoria, ThemeSettings>(
       builder: (context, geo, traj, theme, child) {
-        // Atualiza mapa se tema mudar
         WidgetsBinding.instance.addPostFrameCallback((_) {
           _loadMapStyle(context);
         });
@@ -84,17 +85,45 @@ class _MapPageState extends State<MapPage> {
               myLocationEnabled: true,
               myLocationButtonEnabled: false,
               zoomControlsEnabled: false,
-              onTap: (_) {
-                geo.limparSelecao();
+              onTap: (_) => geo.limparSelecao(),
+              onCameraMove: (pos) {
+                // mostra botão de centralizar se se afastou do centro do trajeto
+                if (traj.navegando && geo.destino != null) {
+                  final distance = GeoUtils.distance(
+                    pos.target.latitude,
+                    pos.target.longitude,
+                    geo.lat,
+                    geo.long,
+                  );
+                  setState(() => _showCentralizarBtn = distance > 20);
+                }
               },
             ),
 
-            // botão localização
+            // botão localização, zoom e centralizar
             Positioned(
               bottom: 20,
               right: 20,
               child: Column(
                 children: [
+                  if (_showCentralizarBtn)
+                    FloatingActionButton(
+                      heroTag: "btnCentralizar",
+                      mini: true,
+                      onPressed: () {
+                        final atual = LatLng(geo.lat, geo.long);
+                        geo.centralizarCameraNavegacao(atual);
+                        setState(() => _showCentralizarBtn = false);
+                      },
+                      backgroundColor: isDark
+                          ? AppThemeDark.curvedButton
+                          : AppThemeLight.curvedButton,
+                      foregroundColor: isDark
+                          ? AppThemeDark.curvedIconSelected
+                          : AppThemeLight.curvedIconSelected,
+                      child: const Icon(Icons.center_focus_strong),
+                    ),
+                  const SizedBox(height: 5),
                   FloatingActionButton(
                     heroTag: "btnLocalizacao",
                     mini: true,
@@ -139,14 +168,13 @@ class _MapPageState extends State<MapPage> {
               ),
             ),
 
-            // Botões de marcador
+            // Botões marcador
             if (geo.marcadorSelecionado != null)
               Positioned(
                 bottom: 20,
                 left: 20,
                 child: Row(
                   children: [
-                    // dentro do Row dos botões de marcador, substitua o atual "Como Chegar" por isso:
                     FloatingActionButton.extended(
                       heroTag: "btnRotas",
                       onPressed: () async {
@@ -168,18 +196,21 @@ class _MapPageState extends State<MapPage> {
                           geo.destino = destino;
                           trajetoria.iniciarNavegacao();
 
-                          // inicia stream de posição para atualizar a rota dinamicamente
-                          geo.iniciarStreamPosicao((atual) async {
+                          // chama stream com heading
+                          geo.iniciarStreamPosicao(trajetoria, (
+                            atual,
+                            heading,
+                          ) {
                             geo.centralizarCameraNavegacao(
                               atual,
-                            ); // centraliza camera
+                              bearing: heading,
+                            );
+
                             if (trajetoria.navegando && geo.destino != null) {
-                              await trajetoria.atualizarRota(
-                                atual,
-                                geo.destino!,
-                              );
+                              trajetoria.atualizarRota(atual, geo.destino!);
                             }
                           });
+
                           geo.marcadorSelecionado = null;
                           geo.atualizar();
                         } catch (e) {
@@ -200,7 +231,6 @@ class _MapPageState extends State<MapPage> {
                           ? AppThemeDark.curvedIconSelected
                           : AppThemeLight.curvedIconSelected,
                     ),
-
                     const SizedBox(width: 15),
                     FloatingActionButton.extended(
                       heroTag: "btnDetalhes",
@@ -231,4 +261,23 @@ class _MapPageState extends State<MapPage> {
       },
     );
   }
+}
+
+// Classe utilitária para calcular distância (metros)
+class GeoUtils {
+  static double distance(double lat1, double lng1, double lat2, double lng2) {
+    const R = 6371000; // raio da Terra em metros
+    final dLat = _deg2rad(lat2 - lat1);
+    final dLng = _deg2rad(lng2 - lng1);
+    final a =
+        math.sin(dLat / 2) * math.sin(dLat / 2) +
+        math.cos(_deg2rad(lat1)) *
+            math.cos(_deg2rad(lat2)) *
+            math.sin(dLng / 2) *
+            math.sin(dLng / 2);
+    final c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
+    return R * c;
+  }
+
+  static double _deg2rad(double d) => d * math.pi / 180;
 }
