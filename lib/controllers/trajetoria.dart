@@ -6,8 +6,12 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 class Trajetoria extends ChangeNotifier {
   final Set<Polyline> _polylines = {};
   Set<Polyline> get polylines => _polylines;
+
   bool _navegando = false;
   bool get navegando => _navegando;
+
+  LatLng? _destinoAtual;
+  LatLng? get destinoAtual => _destinoAtual;
 
   /// Cria a rota do ponto atual até o destino
   Future<void> criarRota(LatLng origem, LatLng destino) async {
@@ -47,12 +51,14 @@ class Trajetoria extends ChangeNotifier {
         ..clear()
         ..add(polyline);
 
+      _destinoAtual = destino;
       notifyListeners();
     }
   }
 
   void limparRotas() {
     _polylines.clear();
+    _destinoAtual = null;
     notifyListeners();
   }
 

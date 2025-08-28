@@ -1,21 +1,26 @@
 import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:provider/provider.dart';
 import 'package:pe_na_estrada_cariri/controllers/darkmode.dart';
 import 'package:pe_na_estrada_cariri/controllers/geolocalizacao.dart';
 import 'package:pe_na_estrada_cariri/controllers/trajetoria.dart';
 import 'package:pe_na_estrada_cariri/pages/detailpages/detail_list.dart';
 import 'package:pe_na_estrada_cariri/theme/dark_theme.dart';
 import 'package:pe_na_estrada_cariri/theme/light_theme.dart';
-import 'package:provider/provider.dart';
 
 class MapPage extends StatefulWidget {
   final LatLng? destino;
   final String? destinoNome;
+  final bool modoComoChegar; // novo parâmetro
 
-  const MapPage({super.key, this.destino, this.destinoNome});
+  const MapPage({
+    super.key,
+    this.destino,
+    this.destinoNome,
+    this.modoComoChegar = false,
+  });
 
   @override
   State<MapPage> createState() => _MapPageState();
@@ -29,33 +34,39 @@ class _MapPageState extends State<MapPage> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final geo = context.read<Geolocalizacao>();
-      geo.getPosicao();
-      if (widget.destino != null) {
-        geo.addDestino(widget.destino!, widget.destinoNome ?? "Destino");
-        Future.delayed(const Duration(milliseconds: 500), () {
-          _mapController?.animateCamera(
-            CameraUpdate.newLatLngZoom(widget.destino!, 17),
-          );
-        });
-      }
-    });
+    WidgetsBinding.instance.addPostFrameCallback((_) => _initMap());
   }
 
-  Future<void> _loadMapStyle(BuildContext context) async {
-    final themeSettings = Provider.of<ThemeSettings>(context, listen: false);
-    if (themeSettings.isDark) {
-      final style = await rootBundle.loadString(
-        'assets/mapstyles/map_style_dark.json',
-      );
-      setState(() => _mapStyle = style);
-    } else {
-      final style = await rootBundle.loadString(
-        'assets/mapstyles/map_style_light.json',
-      );
-      setState(() => _mapStyle = style);
+  void _initMap() {
+    final geo = context.read<Geolocalizacao>();
+    geo.getPosicao();
+
+    if (widget.destino != null) {
+      geo.addDestino(widget.destino!, widget.destinoNome ?? "Destino");
+      Future.delayed(const Duration(milliseconds: 500), () {
+        _mapController?.animateCamera(
+          CameraUpdate.newLatLngZoom(widget.destino!, 17),
+        );
+      });
     }
+  }
+
+  Future<void> _loadMapStyle(BuildContext ctx) async {
+    final theme = Provider.of<ThemeSettings>(ctx, listen: false);
+    final path = theme.isDark
+        ? 'assets/mapstyles/map_style_dark.json'
+        : 'assets/mapstyles/map_style_light.json';
+    _mapStyle = await rootBundle.loadString(path);
+    setState(() {});
+  }
+
+  @override
+  void dispose() {
+    final geo = context.read<Geolocalizacao>();
+    final traj = context.read<Trajetoria>();
+    traj.pararNavegacao();
+    geo.pararStreamPosicao();
+    super.dispose();
   }
 
   @override
@@ -63,210 +74,210 @@ class _MapPageState extends State<MapPage> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Consumer3<Geolocalizacao, Trajetoria, ThemeSettings>(
-      builder: (context, geo, traj, theme, child) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          _loadMapStyle(context);
-        });
+      builder: (ctx, geo, traj, theme, _) {
+        WidgetsBinding.instance.addPostFrameCallback((_) => _loadMapStyle(ctx));
 
-        return Stack(
-          children: [
-            GoogleMap(
-              onMapCreated: (controller) {
-                _mapController = controller;
-                geo.onMapCreated(controller);
-              },
-              style: _mapStyle,
-              markers: geo.markers,
-              polylines: traj.polylines,
-              initialCameraPosition: CameraPosition(
-                target: LatLng(geo.lat, geo.long),
-                zoom: 17,
+        void centralizar() {
+          geo.centralizarCameraNavegacao(LatLng(geo.lat, geo.long));
+          setState(() => _showCentralizarBtn = false);
+        }
+
+        FloatingActionButton fab(
+          IconData icon,
+          VoidCallback onPress,
+          String tag,
+        ) => FloatingActionButton(
+          heroTag: tag,
+          mini: true,
+          onPressed: onPress,
+          backgroundColor: isDark
+              ? AppThemeDark.curvedButton
+              : AppThemeLight.curvedButton,
+          foregroundColor: isDark
+              ? AppThemeDark.curvedIconSelected
+              : AppThemeLight.curvedIconSelected,
+          child: Icon(icon),
+        );
+
+        FloatingActionButton fabExt(
+          String label,
+          IconData icon,
+          VoidCallback onPress,
+          String tag,
+        ) => FloatingActionButton.extended(
+          heroTag: tag,
+          onPressed: onPress,
+          label: Text(label),
+          icon: Icon(icon),
+          backgroundColor: isDark
+              ? AppThemeDark.curvedButton
+              : AppThemeLight.curvedButton,
+          foregroundColor: isDark
+              ? AppThemeDark.curvedIconSelected
+              : AppThemeLight.curvedIconSelected,
+        );
+
+        return Scaffold(
+          body: Stack(
+            children: [
+              GoogleMap(
+                onMapCreated: (c) {
+                  _mapController = c;
+                  geo.onMapCreated(c);
+                },
+                mapType: MapType.normal,
+                style: _mapStyle,
+                markers: geo.markers,
+                polylines: traj.polylines,
+                initialCameraPosition: CameraPosition(
+                  target: LatLng(geo.lat, geo.long),
+                  zoom: 17,
+                ),
+                myLocationEnabled: true,
+                myLocationButtonEnabled: false,
+                zoomControlsEnabled: false,
+                onTap: (_) => geo.limparSelecao(),
+                onCameraMove: (pos) {
+                  if (traj.navegando && geo.destino != null) {
+                    final distance = GeoUtils.distance(
+                      pos.target.latitude,
+                      pos.target.longitude,
+                      geo.lat,
+                      geo.long,
+                    );
+                    setState(() => _showCentralizarBtn = distance > 20);
+                  }
+                },
               ),
-              myLocationEnabled: true,
-              myLocationButtonEnabled: false,
-              zoomControlsEnabled: false,
-              onTap: (_) => geo.limparSelecao(),
-              onCameraMove: (pos) {
-                // mostra botão de centralizar se se afastou do centro do trajeto
-                if (traj.navegando && geo.destino != null) {
-                  final distance = GeoUtils.distance(
-                    pos.target.latitude,
-                    pos.target.longitude,
-                    geo.lat,
-                    geo.long,
-                  );
-                  setState(() => _showCentralizarBtn = distance > 20);
-                }
-              },
-            ),
 
-            // botão localização, zoom e centralizar
-            Positioned(
-              bottom: 20,
-              right: 20,
-              child: Column(
-                children: [
-                  if (_showCentralizarBtn)
-                    FloatingActionButton(
-                      heroTag: "btnCentralizar",
-                      mini: true,
-                      onPressed: () {
-                        final atual = LatLng(geo.lat, geo.long);
-                        geo.centralizarCameraNavegacao(atual);
-                        setState(() => _showCentralizarBtn = false);
-                      },
-                      backgroundColor: isDark
-                          ? AppThemeDark.curvedButton
-                          : AppThemeLight.curvedButton,
-                      foregroundColor: isDark
-                          ? AppThemeDark.curvedIconSelected
-                          : AppThemeLight.curvedIconSelected,
-                      child: const Icon(Icons.center_focus_strong),
-                    ),
-                  const SizedBox(height: 5),
-                  FloatingActionButton(
-                    heroTag: "btnLocalizacao",
-                    mini: true,
-                    onPressed: () => geo.getPosicao(),
-                    backgroundColor: isDark
-                        ? AppThemeDark.curvedButton
-                        : AppThemeLight.curvedButton,
-                    foregroundColor: isDark
-                        ? AppThemeDark.curvedIconSelected
-                        : AppThemeLight.curvedIconSelected,
-                    child: const Icon(Icons.my_location),
-                  ),
-                  const SizedBox(height: 5),
-                  FloatingActionButton(
-                    heroTag: "btnZoomIn",
-                    mini: true,
-                    onPressed: () =>
-                        _mapController?.animateCamera(CameraUpdate.zoomIn()),
-                    backgroundColor: isDark
-                        ? AppThemeDark.curvedButton
-                        : AppThemeLight.curvedButton,
-                    foregroundColor: isDark
-                        ? AppThemeDark.curvedIconSelected
-                        : AppThemeLight.curvedIconSelected,
-                    child: const Icon(Icons.add),
-                  ),
-                  const SizedBox(height: 5),
-                  FloatingActionButton(
-                    heroTag: "btnZoomOut",
-                    mini: true,
-                    onPressed: () =>
-                        _mapController?.animateCamera(CameraUpdate.zoomOut()),
-                    backgroundColor: isDark
-                        ? AppThemeDark.curvedButton
-                        : AppThemeLight.curvedButton,
-                    foregroundColor: isDark
-                        ? AppThemeDark.curvedIconSelected
-                        : AppThemeLight.curvedIconSelected,
-                    child: const Icon(Icons.remove),
-                  ),
-                ],
-              ),
-            ),
-
-            // Botões marcador
-            if (geo.marcadorSelecionado != null)
+              // Botões laterais
               Positioned(
                 bottom: 20,
-                left: 20,
-                child: Row(
+                right: 20,
+                child: Column(
                   children: [
-                    FloatingActionButton.extended(
-                      heroTag: "btnRotas",
-                      onPressed: () async {
-                        final geo = context.read<Geolocalizacao>();
-                        final trajetoria = context.read<Trajetoria>();
+                    if (_showCentralizarBtn)
+                      fab(
+                        Icons.center_focus_strong,
+                        centralizar,
+                        "btnCentralizar",
+                      ),
+                    const SizedBox(height: 5),
+                    fab(
+                      Icons.my_location,
+                      () => geo.getPosicao(),
+                      "btnLocalizacao",
+                    ),
+                    const SizedBox(height: 5),
+                    fab(
+                      Icons.add,
+                      () =>
+                          _mapController?.animateCamera(CameraUpdate.zoomIn()),
+                      "btnZoomIn",
+                    ),
+                    const SizedBox(height: 5),
+                    fab(
+                      Icons.remove,
+                      () =>
+                          _mapController?.animateCamera(CameraUpdate.zoomOut()),
+                      "btnZoomOut",
+                    ),
+                  ],
+                ),
+              ),
 
-                        try {
+              // Botões marcador selecionado
+              if (geo.marcadorSelecionado != null)
+                Positioned(
+                  bottom: 20,
+                  left: 20,
+                  child: Row(
+                    children: [
+                      fabExt(
+                        traj.navegando &&
+                                traj.destinoAtual ==
+                                    LatLng(
+                                      geo.marcadorSelecionado!.latitude,
+                                      geo.marcadorSelecionado!.longitude,
+                                    )
+                            ? "Parar rota"
+                            : "Como chegar",
+                        traj.navegando &&
+                                traj.destinoAtual ==
+                                    LatLng(
+                                      geo.marcadorSelecionado!.latitude,
+                                      geo.marcadorSelecionado!.longitude,
+                                    )
+                            ? Icons.close
+                            : Icons.directions,
+                        () async {
                           final origem = await geo.getPosicao();
                           final destino = LatLng(
                             geo.marcadorSelecionado!.latitude,
                             geo.marcadorSelecionado!.longitude,
                           );
 
-                          await trajetoria.criarRota(origem, destino);
+                          if (traj.navegando && traj.destinoAtual == destino) {
+                            traj.pararNavegacao();
+                            geo.destino = null;
+                            return;
+                          }
+
+                          await traj.criarRota(origem, destino);
                           geo.addDestino(
                             destino,
                             geo.marcadorSelecionado!.nome,
                           );
                           geo.destino = destino;
-                          trajetoria.iniciarNavegacao();
+                          traj.iniciarNavegacao();
 
-                          // chama stream com heading
-                          geo.iniciarStreamPosicao(trajetoria, (
-                            atual,
-                            heading,
-                          ) {
+                          geo.iniciarStreamPosicao(traj, (posAtual, heading) {
                             geo.centralizarCameraNavegacao(
-                              atual,
+                              posAtual,
                               bearing: heading,
                             );
-
-                            if (trajetoria.navegando && geo.destino != null) {
-                              trajetoria.atualizarRota(atual, geo.destino!);
-                            }
                           });
 
                           geo.marcadorSelecionado = null;
                           geo.atualizar();
-                        } catch (e) {
-                          // ignore: use_build_context_synchronously
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Erro ao gerar rota: $e')),
-                          );
-                        }
-                      },
-                      label: Text(traj.navegando ? "Parar" : "Como chegar"),
-                      icon: Icon(
-                        traj.navegando ? Icons.close : Icons.directions,
+                        },
+                        "btnRotas",
                       ),
-                      backgroundColor: isDark
-                          ? AppThemeDark.curvedButton
-                          : AppThemeLight.curvedButton,
-                      foregroundColor: isDark
-                          ? AppThemeDark.curvedIconSelected
-                          : AppThemeLight.curvedIconSelected,
-                    ),
-                    const SizedBox(width: 15),
-                    FloatingActionButton.extended(
-                      heroTag: "btnDetalhes",
-                      onPressed: () {
-                        if (!context.mounted) return;
+                      const SizedBox(width: 15),
+                      fabExt("Saber sobre", Icons.info, () {
+                        if (!ctx.mounted) return;
                         Navigator.push(
-                          context,
+                          ctx,
                           MaterialPageRoute(
                             builder: (_) =>
                                 DetailList(loc: geo.marcadorSelecionado!),
                           ),
                         );
-                      },
-                      label: const Text("Saber sobre"),
-                      icon: const Icon(Icons.info),
-                      backgroundColor: isDark
-                          ? AppThemeDark.curvedButton
-                          : AppThemeLight.curvedButton,
-                      foregroundColor: isDark
-                          ? AppThemeDark.curvedIconSelected
-                          : AppThemeLight.curvedIconSelected,
-                    ),
-                  ],
+                      }, "btnDetalhes"),
+                    ],
+                  ),
                 ),
-              ),
-          ],
+
+              // Novo: botão de sair do modo Como Chegar
+              if (widget.modoComoChegar)
+                Positioned(
+                  top: 20,
+                  right: 20,
+                  child: fabExt("Voltar", Icons.close, () {
+                    Navigator.pop(context); // volta para a ListPage
+                  }, "btnSairComoChegar"),
+                ),
+            ],
+          ),
         );
       },
     );
   }
 }
 
-// Classe utilitária para calcular distância (metros)
 class GeoUtils {
   static double distance(double lat1, double lng1, double lat2, double lng2) {
-    const R = 6371000; // raio da Terra em metros
+    const R = 6371000;
     final dLat = _deg2rad(lat2 - lat1);
     final dLng = _deg2rad(lng2 - lng1);
     final a =

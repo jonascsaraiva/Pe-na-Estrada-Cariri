@@ -154,7 +154,7 @@ class _ListPageState extends State<ListPage> {
                         imageUrl: loc.foto,
                         placeholder: (context, url) => shimmerPlaceholder(),
                         errorWidget: (context, url, error) =>
-                            const Icon(Icons.error),
+                            shimmerPlaceholder(),
                         fit: BoxFit.fill,
                       ),
                       Container(

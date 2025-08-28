@@ -3,6 +3,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:pe_na_estrada_cariri/controllers/geolocalizacao.dart';
 import 'package:pe_na_estrada_cariri/controllers/trajetoria.dart';
 import 'package:pe_na_estrada_cariri/models/localizacoes.dart';
+import 'package:pe_na_estrada_cariri/pages/map_page.dart';
 import 'package:pe_na_estrada_cariri/theme/shimmerplaceholder.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -23,12 +24,18 @@ class DetailList extends StatelessWidget {
             aspectRatio: 16 / 9,
             child: CachedNetworkImage(
               imageUrl: loc.foto,
-              placeholder: (context, url) => shimmerPlaceholder(),
-              errorWidget: (context, url, error) =>
-                  const Icon(Icons.error, size: 50),
+              placeholder: (context, url) => shimmerPlaceholder(
+                height: double.infinity,
+                width: double.infinity,
+              ),
+              errorWidget: (context, url, error) => shimmerPlaceholder(
+                height: double.infinity,
+                width: double.infinity,
+              ),
               fit: BoxFit.cover,
             ),
           ),
+
           Padding(
             padding: const EdgeInsets.all(20),
             child: Column(
@@ -61,24 +68,10 @@ class DetailList extends StatelessWidget {
                   children: [
                     Expanded(
                       child: OutlinedButton.icon(
-                        onPressed: () {
-                          context.read<Geolocalizacao>().irParaDestino(
-                            LatLng(loc.latitude, loc.longitude),
-                          );
-                          Navigator.pop(context);
-                        },
-                        icon: const Icon(Icons.map),
-                        label: const Text('Ver no mapa'),
-                      ),
-                    ),
-                    const SizedBox(width: 15),
-                    Expanded(
-                      child: OutlinedButton.icon(
                         onPressed: () async {
                           final geo = context.read<Geolocalizacao>();
                           final traj = context.read<Trajetoria>();
                           final messenger = ScaffoldMessenger.of(context);
-                          final trajetoria = context.read<Trajetoria>();
 
                           try {
                             final origem = await geo.getPosicao();
@@ -91,27 +84,25 @@ class DetailList extends StatelessWidget {
                             geo.destino = destino;
                             geo.irParaDestino(destino);
 
-                            // inicia stream para atualização em tempo real
-                            geo.iniciarStreamPosicao(trajetoria, (
-                              posAtual,
-                              heading,
-                            ) {
-                              if (trajetoria.navegando && geo.destino != null) {
-                                trajetoria.atualizarRota(
-                                  posAtual,
-                                  geo.destino!,
-                                );
-                                geo.centralizarCameraNavegacao(
-                                  posAtual,
-                                  bearing: heading,
-                                );
-                              }
+                            geo.iniciarStreamPosicao(traj, (posAtual, heading) {
+                              geo.centralizarCameraNavegacao(
+                                posAtual,
+                                bearing: heading,
+                              );
                             });
 
-                            Navigator.of(
-                              // ignore: use_build_context_synchronously
+                            // abre o MapPage no modo “Como Chegar”
+                            if (!context.mounted) return;
+                            Navigator.push(
                               context,
-                            ).popUntil((route) => route.isFirst);
+                              MaterialPageRoute(
+                                builder: (_) => MapPage(
+                                  destino: destino,
+                                  destinoNome: loc.nome,
+                                  modoComoChegar: true, // ativa o botão Voltar
+                                ),
+                              ),
+                            );
                           } catch (e) {
                             messenger.showSnackBar(
                               SnackBar(content: Text('Erro ao gerar rota: $e')),

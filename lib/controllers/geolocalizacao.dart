@@ -116,7 +116,7 @@ class Geolocalizacao extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ------------------- STREAM GPS + SNAP-TO-ROAD -------------------
+  // ------------------- STREAM GPS + BEARING SUAVE -------------------
   void iniciarStreamPosicao(
     Trajetoria traj,
     void Function(LatLng pos, double heading) onUpdate, {
@@ -145,21 +145,33 @@ class Geolocalizacao extends ChangeNotifier {
             heading = _ultimoBearing;
           }
 
-          _ultimoBearing = heading;
-          _ultimoPonto = atual;
+          // Suaviza bearing
+          final smoothedBearing = _suavizar(_ultimoBearing, heading);
+
+          // Suaviza movimento
+          final smoothedPosition = _suavizarPosicao(
+            _ultimoPonto ?? atual,
+            atual,
+          );
+
+          _ultimoBearing = smoothedBearing;
+          _ultimoPonto = smoothedPosition;
 
           // Atualiza trajeto via API
           if (traj.navegando && destino != null) {
-            await traj.atualizarRota(atual, destino!);
+            await traj.atualizarRota(smoothedPosition, destino!);
           }
 
-          // Atualiza câmera se habilitado
+          // Atualiza câmera
           if (centralizar) {
-            centralizarCameraNavegacao(atual, bearing: heading);
+            centralizarCameraNavegacao(
+              smoothedPosition,
+              bearing: smoothedBearing,
+            );
           }
 
           notifyListeners();
-          onUpdate(atual, heading); // passa ambos
+          onUpdate(smoothedPosition, smoothedBearing);
         });
   }
 
@@ -199,4 +211,17 @@ class Geolocalizacao extends ChangeNotifier {
 
   double _deg2rad(double d) => d * math.pi / 180.0;
   double _rad2deg(double r) => r * 180.0 / math.pi;
+
+  // ------------------- SUAVIZAÇÃO -------------------
+  double _suavizar(double atual, double alvo, [double fator = 0.15]) {
+    // interpolação linear para bearing
+    double diff = (alvo - atual + 540) % 360 - 180; // diferença mínima
+    return (atual + diff * fator) % 360;
+  }
+
+  LatLng _suavizarPosicao(LatLng atual, LatLng alvo, [double fator = 0.15]) {
+    final lat = atual.latitude + (alvo.latitude - atual.latitude) * fator;
+    final lng = atual.longitude + (alvo.longitude - atual.longitude) * fator;
+    return LatLng(lat, lng);
+  }
 }
