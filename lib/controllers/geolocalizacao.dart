@@ -1,12 +1,9 @@
 import 'dart:async';
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:pe_na_estrada_cariri/models/localizacoes.dart';
 import 'package:pe_na_estrada_cariri/repositories/loc_repository.dart';
-import 'package:pe_na_estrada_cariri/controllers/trajetoria.dart';
 
 class Geolocalizacao extends ChangeNotifier {
   double lat = 0.0;
@@ -21,10 +18,6 @@ class Geolocalizacao extends ChangeNotifier {
   late GoogleMapController _mapsController;
   get mapsController => _mapsController;
 
-  // Estado do GPS
-  LatLng? _ultimoPonto;
-  double _ultimoBearing = 0.0;
-
   StreamSubscription<Position>? _posicaoStream;
 
   // ------------------- MAPA -------------------
@@ -32,6 +25,7 @@ class Geolocalizacao extends ChangeNotifier {
     _mapsController = gmc;
     await getPosicao();
     loadPostos();
+    iniciarStreamPosicao(); // já começa a acompanhar
   }
 
   Future<void> loadPostos() async {
@@ -62,8 +56,7 @@ class Geolocalizacao extends ChangeNotifier {
 
       final atual = LatLng(lat, long);
 
-      // Centraliza no mapa
-      centralizarCameraNavegacao(atual, bearing: _ultimoBearing);
+      centralizarCamera(atual);
 
       notifyListeners();
       return atual;
@@ -108,7 +101,7 @@ class Geolocalizacao extends ChangeNotifier {
 
   void irParaDestino(LatLng destino) {
     this.destino = destino;
-    centralizarCameraNavegacao(destino);
+    centralizarCamera(destino);
   }
 
   void limparSelecao() {
@@ -116,12 +109,8 @@ class Geolocalizacao extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ------------------- STREAM GPS + BEARING SUAVE -------------------
-  void iniciarStreamPosicao(
-    Trajetoria traj,
-    void Function(LatLng pos, double heading) onUpdate, {
-    bool centralizar = true,
-  }) {
+  // ------------------- STREAM SIMPLES -------------------
+  void iniciarStreamPosicao() {
     _posicaoStream?.cancel();
 
     _posicaoStream =
@@ -130,48 +119,16 @@ class Geolocalizacao extends ChangeNotifier {
             accuracy: LocationAccuracy.bestForNavigation,
             distanceFilter: 2,
           ),
-        ).listen((pos) async {
-          final atual = LatLng(pos.latitude, pos.longitude);
+        ).listen((pos) {
           lat = pos.latitude;
           long = pos.longitude;
 
-          // Calcula direção
-          double heading;
-          if (pos.heading.isFinite && pos.heading != 0.0) {
-            heading = _normalizeBearing(pos.heading);
-          } else if (_ultimoPonto != null) {
-            heading = _bearingBetween(_ultimoPonto!, atual);
-          } else {
-            heading = _ultimoBearing;
-          }
+          final atual = LatLng(lat, long);
 
-          // Suaviza bearing
-          final smoothedBearing = _suavizar(_ultimoBearing, heading);
-
-          // Suaviza movimento
-          final smoothedPosition = _suavizarPosicao(
-            _ultimoPonto ?? atual,
-            atual,
-          );
-
-          _ultimoBearing = smoothedBearing;
-          _ultimoPonto = smoothedPosition;
-
-          // Atualiza trajeto via API
-          if (traj.navegando && destino != null) {
-            await traj.atualizarRota(smoothedPosition, destino!);
-          }
-
-          // Atualiza câmera
-          if (centralizar) {
-            centralizarCameraNavegacao(
-              smoothedPosition,
-              bearing: smoothedBearing,
-            );
-          }
+          // Centraliza SEM suavização, sem tilt, sem bearing
+          centralizarCamera(atual);
 
           notifyListeners();
-          onUpdate(smoothedPosition, smoothedBearing);
         });
   }
 
@@ -180,48 +137,9 @@ class Geolocalizacao extends ChangeNotifier {
     _posicaoStream = null;
   }
 
-  void centralizarCameraNavegacao(
-    LatLng atual, {
-    double bearing = 0,
-    double zoom = 19.5,
-    double tilt = 60,
-  }) {
+  void centralizarCamera(LatLng atual, {double zoom = 18}) {
     _mapsController.animateCamera(
-      CameraUpdate.newCameraPosition(
-        CameraPosition(target: atual, zoom: zoom, tilt: tilt, bearing: bearing),
-      ),
+      CameraUpdate.newCameraPosition(CameraPosition(target: atual, zoom: zoom)),
     );
-  }
-
-  // ------------------- UTILS -------------------
-  double _normalizeBearing(double b) => (b % 360 + 360) % 360;
-
-  double _bearingBetween(LatLng from, LatLng to) {
-    final lat1 = _deg2rad(from.latitude);
-    final lat2 = _deg2rad(to.latitude);
-    final dLon = _deg2rad(to.longitude - from.longitude);
-
-    final y = math.sin(dLon) * math.cos(lat2);
-    final x =
-        math.cos(lat1) * math.sin(lat2) -
-        math.sin(lat1) * math.cos(lat2) * math.cos(dLon);
-    final brng = math.atan2(y, x);
-    return _normalizeBearing(_rad2deg(brng));
-  }
-
-  double _deg2rad(double d) => d * math.pi / 180.0;
-  double _rad2deg(double r) => r * 180.0 / math.pi;
-
-  // ------------------- SUAVIZAÇÃO -------------------
-  double _suavizar(double atual, double alvo, [double fator = 0.15]) {
-    // interpolação linear para bearing
-    double diff = (alvo - atual + 540) % 360 - 180; // diferença mínima
-    return (atual + diff * fator) % 360;
-  }
-
-  LatLng _suavizarPosicao(LatLng atual, LatLng alvo, [double fator = 0.15]) {
-    final lat = atual.latitude + (alvo.latitude - atual.latitude) * fator;
-    final lng = atual.longitude + (alvo.longitude - atual.longitude) * fator;
-    return LatLng(lat, lng);
   }
 }

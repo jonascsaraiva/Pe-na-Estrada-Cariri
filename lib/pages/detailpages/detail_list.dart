@@ -84,14 +84,8 @@ class DetailList extends StatelessWidget {
                             geo.destino = destino;
                             geo.irParaDestino(destino);
 
-                            geo.iniciarStreamPosicao(traj, (posAtual, heading) {
-                              geo.centralizarCameraNavegacao(
-                                posAtual,
-                                bearing: heading,
-                              );
-                            });
+                            geo.iniciarStreamPosicao();
 
-                            // abre o MapPage no modo “Como Chegar”
                             if (!context.mounted) return;
                             Navigator.push(
                               context,
@@ -99,7 +93,7 @@ class DetailList extends StatelessWidget {
                                 builder: (_) => MapPage(
                                   destino: destino,
                                   destinoNome: loc.nome,
-                                  modoComoChegar: true, // ativa o botão Voltar
+                                  modoComoChegar: true,
                                 ),
                               ),
                             );
