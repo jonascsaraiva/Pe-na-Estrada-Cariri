@@ -144,7 +144,12 @@ class MapController {
           await traj.criarRota(origem, destino);
           geo.addDestino(destino, geo.marcadorSelecionado!.nome);
           traj.iniciarNavegacao();
-          geo.iniciarStreamPosicao();
+          geo.iniciarStreamPosicao(
+            onUpdate: (LatLng novaPos) async {
+              traj.atualizarPosicao(novaPos);
+              _mapController?.animateCamera(CameraUpdate.newLatLng(novaPos));
+            },
+          );
         }
         geo.marcadorSelecionado = null;
         geo.atualizar();

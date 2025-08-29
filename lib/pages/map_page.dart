@@ -58,7 +58,9 @@ class _MapPageState extends State<MapPage> {
                 mapType: MapType.normal,
                 style: _controller.mapStyle,
                 markers: geo.markers,
-                polylines: traj.polylines,
+                polylines: Set<Polyline>.from(
+                  traj.polylines,
+                ), // <- importante converter
                 initialCameraPosition: CameraPosition(
                   target: LatLng(geo.lat, geo.long),
                   zoom: 17,

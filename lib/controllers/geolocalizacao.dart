@@ -6,10 +6,10 @@ import 'package:pe_na_estrada_cariri/models/localizacoes.dart';
 import 'package:pe_na_estrada_cariri/repositories/loc_repository.dart';
 
 class Geolocalizacao extends ChangeNotifier {
+  StreamSubscription<Position>? _posicaoStream;
   double lat = 0.0;
   double long = 0.0;
   String erro = '';
-
   LatLng? destino;
 
   Set<Marker> markers = {};
@@ -18,14 +18,11 @@ class Geolocalizacao extends ChangeNotifier {
   late GoogleMapController _mapsController;
   get mapsController => _mapsController;
 
-  StreamSubscription<Position>? _posicaoStream;
-
-  // ------------------- MAPA -------------------
   onMapCreated(GoogleMapController gmc) async {
     _mapsController = gmc;
     await getPosicao();
     loadPostos();
-    iniciarStreamPosicao(); // já começa a acompanhar
+    iniciarStreamPosicao();
   }
 
   Future<void> loadPostos() async {
@@ -110,7 +107,7 @@ class Geolocalizacao extends ChangeNotifier {
   }
 
   // ------------------- STREAM SIMPLES -------------------
-  void iniciarStreamPosicao() {
+  void iniciarStreamPosicao({Function(LatLng)? onUpdate}) {
     _posicaoStream?.cancel();
 
     _posicaoStream =
@@ -124,8 +121,9 @@ class Geolocalizacao extends ChangeNotifier {
           long = pos.longitude;
 
           final atual = LatLng(lat, long);
-
-          // Centraliza SEM suavização, sem tilt, sem bearing
+          if (onUpdate != null) {
+            onUpdate(atual);
+          }
           centralizarCamera(atual);
 
           notifyListeners();
