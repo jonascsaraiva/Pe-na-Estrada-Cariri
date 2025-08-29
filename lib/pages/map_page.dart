@@ -4,6 +4,7 @@ import 'package:pe_na_estrada_cariri/controllers/map_controller.dart';
 import 'package:provider/provider.dart';
 import 'package:pe_na_estrada_cariri/controllers/geolocalizacao.dart';
 import 'package:pe_na_estrada_cariri/controllers/trajetoria.dart';
+import 'package:pe_na_estrada_cariri/controllers/darkmode.dart';
 
 class MapPage extends StatefulWidget {
   final LatLng? destino;
@@ -27,7 +28,13 @@ class _MapPageState extends State<MapPage> {
   @override
   void initState() {
     super.initState();
-    _controller = MapController(context, widget.destino, widget.destinoNome);
+    final theme = context.read<ThemeSettings>();
+    _controller = MapController(
+      context,
+      widget.destino,
+      widget.destinoNome,
+      theme,
+    );
     _controller.init();
   }
 
@@ -39,8 +46,10 @@ class _MapPageState extends State<MapPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer2<Geolocalizacao, Trajetoria>(
-      builder: (_, geo, traj, __) {
+    return Consumer3<Geolocalizacao, Trajetoria, ThemeSettings>(
+      builder: (_, geo, traj, theme, __) {
+        _controller.applyThemeIfReady(theme.isDark);
+
         return Scaffold(
           body: Stack(
             children: [

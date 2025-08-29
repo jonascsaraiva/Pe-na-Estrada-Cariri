@@ -1,19 +1,20 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:pe_na_estrada_cariri/controllers/darkmode.dart';
 import 'package:pe_na_estrada_cariri/controllers/geolocalizacao.dart';
 import 'package:pe_na_estrada_cariri/controllers/trajetoria.dart';
-import 'package:pe_na_estrada_cariri/theme/dark_theme.dart';
-import 'package:pe_na_estrada_cariri/theme/light_theme.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 import 'package:pe_na_estrada_cariri/pages/detailpages/detail_list.dart';
+import 'package:pe_na_estrada_cariri/theme/dark_theme.dart';
+import 'package:pe_na_estrada_cariri/theme/light_theme.dart';
+import 'package:pe_na_estrada_cariri/controllers/darkmode.dart';
 
 class MapController {
   final BuildContext context;
   final LatLng? initialDestino;
   final String? initialDestinoNome;
+  final ThemeSettings theme;
 
   late final Geolocalizacao geo;
   late final Trajetoria traj;
@@ -23,7 +24,12 @@ class MapController {
 
   final ValueNotifier<bool> showCentralizarBtn = ValueNotifier(false);
 
-  MapController(this.context, this.initialDestino, this.initialDestinoNome) {
+  MapController(
+    this.context,
+    this.initialDestino,
+    this.initialDestinoNome,
+    this.theme,
+  ) {
     geo = context.read<Geolocalizacao>();
     traj = context.read<Trajetoria>();
   }
@@ -43,7 +49,6 @@ class MapController {
   }
 
   Future<void> _loadMapStyle() async {
-    final theme = context.read<ThemeSettings>();
     final path = theme.isDark
         ? 'assets/mapstyles/map_style_dark.json'
         : 'assets/mapstyles/map_style_light.json';
@@ -58,6 +63,8 @@ class MapController {
   void onMapCreated(GoogleMapController controller) {
     _mapController = controller;
     geo.onMapCreated(controller);
+    // Aplica o tema inicial
+    applyThemeIfReady(theme.isDark);
   }
 
   void onCameraMove(CameraPosition pos) {
@@ -82,24 +89,26 @@ class MapController {
     showCentralizarBtn.value = false;
   }
 
-  // --- FABs normais ---
-  Widget fabCentralizar() =>
+  FloatingActionButton fabCentralizar() =>
       _fab(Icons.center_focus_strong, centralizar, "btnCentralizar");
-  Widget fabMinhaLocalizacao() =>
+
+  FloatingActionButton fabMinhaLocalizacao() =>
       _fab(Icons.my_location, () => geo.getPosicao(), "btnLocalizacao");
-  Widget fabZoomIn() => _fab(
+
+  FloatingActionButton fabZoomIn() => _fab(
     Icons.add,
     () => _mapController?.animateCamera(CameraUpdate.zoomIn()),
     "btnZoomIn",
   );
-  Widget fabZoomOut() => _fab(
+
+  FloatingActionButton fabZoomOut() => _fab(
     Icons.remove,
     () => _mapController?.animateCamera(CameraUpdate.zoomOut()),
     "btnZoomOut",
   );
 
-  Widget _fab(IconData icon, VoidCallback onPress, String tag) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+  FloatingActionButton _fab(IconData icon, VoidCallback onPress, String tag) {
+    final isDark = theme.isDark;
     return FloatingActionButton(
       heroTag: tag,
       mini: true,
@@ -114,18 +123,19 @@ class MapController {
     );
   }
 
-  // --- FABs estendidos ---
-  Widget fabComoChegar() {
+  FloatingActionButton fabComoChegar() {
+    if (geo.marcadorSelecionado == null) {
+      return _fab(Icons.directions, () {}, "btnRotas");
+    }
     final destino = LatLng(
       geo.marcadorSelecionado!.latitude,
       geo.marcadorSelecionado!.longitude,
     );
     final isAtivo = traj.navegando && traj.destinoAtual == destino;
 
-    return _fabExt(
-      isAtivo ? "Parar rota" : "Como chegar",
-      isAtivo ? Icons.close : Icons.directions,
-      () async {
+    return FloatingActionButton.extended(
+      heroTag: "btnRotas",
+      onPressed: () async {
         final origem = await geo.getPosicao();
         if (isAtivo) {
           traj.pararNavegacao();
@@ -139,46 +149,70 @@ class MapController {
         geo.marcadorSelecionado = null;
         geo.atualizar();
       },
-      "btnRotas",
-    );
-  }
-
-  Widget fabSaberSobre() => _fabExt("Saber sobre", Icons.info, () {
-    if (!context.mounted) return;
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => DetailList(loc: geo.marcadorSelecionado!),
-      ),
-    );
-  }, "btnDetalhes");
-
-  Widget fabSairComoChegar() => _fabExt(
-    "Voltar",
-    Icons.close,
-    () => Navigator.pop(context),
-    "btnSairComoChegar",
-  );
-
-  Widget _fabExt(
-    String label,
-    IconData icon,
-    VoidCallback onPress,
-    String tag,
-  ) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return FloatingActionButton.extended(
-      heroTag: tag,
-      onPressed: onPress,
-      label: Text(label),
-      icon: Icon(icon),
-      backgroundColor: isDark
+      label: Text(isAtivo ? "Parar rota" : "Como chegar"),
+      icon: Icon(isAtivo ? Icons.close : Icons.directions),
+      backgroundColor: theme.isDark
           ? AppThemeDark.curvedButton
           : AppThemeLight.curvedButton,
-      foregroundColor: isDark
+      foregroundColor: theme.isDark
           ? AppThemeDark.curvedIconSelected
           : AppThemeLight.curvedIconSelected,
     );
+  }
+
+  FloatingActionButton fabSaberSobre() {
+    if (geo.marcadorSelecionado == null) {
+      return _fab(Icons.info, () {}, "btnDetalhes");
+    }
+
+    return FloatingActionButton.extended(
+      heroTag: "btnDetalhes",
+      onPressed: () {
+        if (!context.mounted) return;
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => DetailList(loc: geo.marcadorSelecionado!),
+          ),
+        );
+      },
+      label: const Text("Saber sobre"),
+      icon: const Icon(Icons.info),
+      backgroundColor: theme.isDark
+          ? AppThemeDark.curvedButton
+          : AppThemeLight.curvedButton,
+      foregroundColor: theme.isDark
+          ? AppThemeDark.curvedIconSelected
+          : AppThemeLight.curvedIconSelected,
+    );
+  }
+
+  FloatingActionButton fabSairComoChegar() {
+    return FloatingActionButton.extended(
+      heroTag: "btnSairComoChegar",
+      onPressed: () => Navigator.pop(context),
+      label: const Text("Voltar"),
+      icon: const Icon(Icons.close),
+      backgroundColor: theme.isDark
+          ? AppThemeDark.curvedButton
+          : AppThemeLight.curvedButton,
+      foregroundColor: theme.isDark
+          ? AppThemeDark.curvedIconSelected
+          : AppThemeLight.curvedIconSelected,
+    );
+  }
+
+  /// Aplica tema no mapa se ele já foi criado
+  void applyThemeIfReady(bool isDark) {
+    if (_mapController != null && mapStyle != null) {
+      final path = isDark
+          ? 'assets/mapstyles/map_style_dark.json'
+          : 'assets/mapstyles/map_style_light.json';
+      rootBundle.loadString(path).then((style) {
+        // ignore: deprecated_member_use
+        _mapController?.setMapStyle(style);
+      });
+    }
   }
 }
 

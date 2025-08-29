@@ -19,40 +19,41 @@ class Trajetoria extends ChangeNotifier {
       apiKey: "AIzaSyBIHVSEY_Fe7mr9eyb53Ux9bunA0y7EAvQ",
     );
 
-    final request = RoutesApiRequest(
-      origin: PointLatLng(origem.latitude, origem.longitude),
-      destination: PointLatLng(destino.latitude, destino.longitude),
-      travelMode: TravelMode.driving,
-      routingPreference: RoutingPreference.trafficAware,
-    );
-
-    final response = await polylinePoints.getRouteBetweenCoordinatesV2(
-      request: request,
-    );
-
-    if (response.routes.isNotEmpty) {
-      final route = response.routes.first;
-
-      final pontos = route.polylinePoints ?? [];
-
-      final polylineCoordinates = pontos
-          .map((p) => LatLng(p.latitude, p.longitude))
-          .toList();
-
-      // Adiciona polyline no mapa
-      final polyline = Polyline(
-        polylineId: PolylineId("rota"),
-        color: const Color(0xFF00BCF4),
-        width: 6,
-        points: polylineCoordinates,
+    try {
+      final request = RoutesApiRequest(
+        origin: PointLatLng(origem.latitude, origem.longitude),
+        destination: PointLatLng(destino.latitude, destino.longitude),
+        travelMode: TravelMode.driving,
+        routingPreference: RoutingPreference.trafficAware,
       );
 
-      _polylines
-        ..clear()
-        ..add(polyline);
+      final response = await polylinePoints.getRouteBetweenCoordinatesV2(
+        request: request,
+      );
 
-      _destinoAtual = destino;
-      notifyListeners();
+      if (response.routes.isNotEmpty) {
+        final route = response.routes.first;
+        final pontos = route.polylinePoints ?? [];
+        final polylineCoordinates = pontos
+            .map((p) => LatLng(p.latitude, p.longitude))
+            .toList();
+
+        _polylines
+          ..clear()
+          ..add(
+            Polyline(
+              polylineId: const PolylineId("rota"),
+              color: const Color(0xFF00BCF4),
+              width: 6,
+              points: polylineCoordinates,
+            ),
+          );
+
+        _destinoAtual = destino;
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint("Erro ao criar rota: $e");
     }
   }
 
