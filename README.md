@@ -75,30 +75,40 @@ flutter run
 ## 📂 Estrutura de Pastas
 
 lib/
- ├── controllers/               Camada de controle (lógica e estados)
- │    ├── darkmode.dart         Controle do modo escuro/claro
- │    ├── geolocalizacao.dart   Lógica de geolocalização
- │    └── trajetoria.dart       Controle de trajetórias/rotas
+ ├── controllers/                    Camada de controle (lógica e estados)
+ │    ├── darkmode.dart                Controle do modo escuro/claro
+ │    ├── geolocalizacao.dart          Lógica de geolocalização
+ │    ├── historico_controller.dart    Lógica do historico
+ │    ├── map_controller.dart          Lógica do mapa
+ │    ├── snap_road.dart               Ajuste de cordenadas
+ │    └── trajetoria.dart              Controle de trajetórias/rotas
  │
  ├── models/                   
- │    └── localizacoes.dart     Modelos de dados de localizações
+ │    ├── localizacoes.dart            Modelos de dados de localizações
+ │    ├── localizacoes.g.dart          Modelos de dados complental do Hive
+ │    ├── visitados.dart               Modelos de dados de lugares visitados
+ │    └── visitados.g.dart             Modelos de dados complental do Hive
  │
- ├── pages/                     Telas principais do app
- │    ├── detailpages/          Telas de detalhes
- │    │    ├── detail_list.dart
- │    │    ├── config_page.dart
- │    │    ├── fav_page.dart
- │    │    ├── list_page.dart
- │    │    └── map_page.dart
+ ├── pages/                          Telas principais do app
+ │    ├── detailpages/               Telas de detalhes complementares as principais
+ │    │    ├── card_destino.dart       Card de chegada ao destino 
+ │    │    └── detail_list.dart        Tela de detalhes de itens da lista
+ │    │
+ │    ├── config_page.dart             Tela reservada para configurações
+ │    ├── fav_page.dart                Tela dos itens favoritos
+ │    ├── historico_page.dart          Tela do historico de navegação
+ │    ├── list_page.dart               Tela de lista do itens
+ │    └── map_page.dart                Tela do Mapa
  │
  ├── repositories/             
- │    └── loc_repository.dart   Repositório de dados das localizações
+ │    └── loc_repository.dart        Repositório de dados das localizações
  │
- ├── theme/                    
- │    ├── dark_theme.dart       Definições de tema escuro
- │    ├── light_theme.dart      Definições de tema claro
- │    └── home_page.dart        Página inicial com suporte a tema
- │
- └── main.dart  
+ ├── theme/                         UI
+ │    ├── dark_theme.dart              Definições de tema escuro
+ │    ├── light_theme.dart             Definições de tema claro
+ │    └── shimmerplaceholder.dart      Definições para loading de imagens
+ │ 
+ ├── home_page.dart                  Tela principal com AppBar e Navigation estaticos
+ └── main.dart                       Roda o aplicativo
  
  ---

@@ -5,7 +5,6 @@ import 'package:pe_na_estrada_cariri/models/visitados.dart';
 class HistoricoController {
   static const String boxName = "historicoBox";
 
-  /// Abre a box (ou reutiliza se já estiver aberta)
   Future<Box<Visitado>> _getBox() async {
     if (Hive.isBoxOpen(boxName)) {
       return Hive.box<Visitado>(boxName);
