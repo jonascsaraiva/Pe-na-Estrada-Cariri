@@ -368,6 +368,15 @@ class LocRepository extends ChangeNotifier {
       descricao:
           'O Teatro Marquise Branca funciona em um dos prédios mais antigos de Juazeiro do Norte, está fechado temporariamente para obras.',
     ),
+    Localizacoes(
+      nome: 'Casa teste',
+      endereco: 'Lá em casa',
+      foto:
+          'https://img.freepik.com/vetores-gratis/casa-encantadora-com-ilustracao-de-arvore_1308-176337.jpg?semt=ais_hybrid&w=740&q=80',
+      latitude: -7.228348472050471,
+      longitude: -39.35311570844969,
+      descricao: 'Endereço para teste que vai lá pra casa',
+    ),
   ];
 
   List<Localizacoes> get localizacoes => _localizacoes;

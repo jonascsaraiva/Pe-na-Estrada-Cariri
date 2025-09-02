@@ -2,13 +2,16 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:pe_na_estrada_cariri/controllers/geolocalizacao.dart';
+import 'package:pe_na_estrada_cariri/controllers/historico_controller.dart';
 import 'package:pe_na_estrada_cariri/controllers/trajetoria.dart';
+import 'package:pe_na_estrada_cariri/pages/detailpages/card_destino.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 import 'package:pe_na_estrada_cariri/pages/detailpages/detail_list.dart';
 import 'package:pe_na_estrada_cariri/theme/dark_theme.dart';
 import 'package:pe_na_estrada_cariri/theme/light_theme.dart';
 import 'package:pe_na_estrada_cariri/controllers/darkmode.dart';
+import 'package:pe_na_estrada_cariri/models/localizacoes.dart';
 
 class MapController {
   final BuildContext context;
@@ -23,6 +26,9 @@ class MapController {
   String? mapStyle;
 
   final ValueNotifier<bool> showCentralizarBtn = ValueNotifier(false);
+
+  // Guarda o destino atual em navegação
+  Localizacoes? _destinoEmCurso;
 
   MapController(
     this.context,
@@ -63,7 +69,6 @@ class MapController {
   void onMapCreated(GoogleMapController controller) {
     _mapController = controller;
     geo.onMapCreated(controller);
-    // Aplica o tema inicial
     applyThemeIfReady(theme.isDark);
   }
 
@@ -127,6 +132,7 @@ class MapController {
     if (geo.marcadorSelecionado == null) {
       return _fab(Icons.directions, () {}, "btnRotas");
     }
+
     final destino = LatLng(
       geo.marcadorSelecionado!.latitude,
       geo.marcadorSelecionado!.longitude,
@@ -137,22 +143,64 @@ class MapController {
       heroTag: "btnRotas",
       onPressed: () async {
         final origem = await geo.getPosicao();
+
         if (isAtivo) {
           traj.pararNavegacao();
           geo.destino = null;
+          _destinoEmCurso = null;
         } else {
+          // Guardar o destino antes de limpar
+          _destinoEmCurso = geo.marcadorSelecionado;
+
           await traj.criarRota(origem, destino);
           geo.addDestino(destino, geo.marcadorSelecionado!.nome);
           traj.iniciarNavegacao();
+
           geo.iniciarStreamPosicao(
             onUpdate: (LatLng novaPos) async {
-              traj.atualizarPosicao(novaPos);
+              await traj.atualizarPosicao(novaPos);
               _mapController?.animateCamera(CameraUpdate.newLatLng(novaPos));
+
+              if (traj.destinoAtual != null) {
+                final distance = GeoUtils.distance(
+                  novaPos.latitude,
+                  novaPos.longitude,
+                  traj.destinoAtual!.latitude,
+                  traj.destinoAtual!.longitude,
+                );
+
+                if (distance <= 30) {
+                  traj.pararNavegacao();
+                  geo.destino = null;
+
+                  if (_destinoEmCurso != null) {
+                    final historico = HistoricoController();
+                    final partidaStr =
+                        "${novaPos.latitude},${novaPos.longitude}";
+                    await historico.addVisita(
+                      partida: partidaStr,
+                      destino: _destinoEmCurso!,
+                    );
+
+                    if (context.mounted) {
+                      mostrarOverlayChegada(
+                        context,
+                        _destinoEmCurso!.nome,
+                        theme.isDark,
+                      );
+                    }
+                  }
+
+                  _destinoEmCurso = null;
+                  geo.pararStreamPosicao();
+                }
+              }
             },
           );
+
+          geo.marcadorSelecionado = null;
+          geo.atualizar();
         }
-        geo.marcadorSelecionado = null;
-        geo.atualizar();
       },
       label: Text(isAtivo ? "Parar rota" : "Como chegar"),
       icon: Icon(isAtivo ? Icons.close : Icons.directions),
@@ -207,7 +255,6 @@ class MapController {
     );
   }
 
-  /// Aplica tema no mapa se ele já foi criado
   void applyThemeIfReady(bool isDark) {
     if (_mapController != null && mapStyle != null) {
       final path = isDark
@@ -219,6 +266,22 @@ class MapController {
       });
     }
   }
+}
+
+/// Função helper para overlay
+void mostrarOverlayChegada(BuildContext context, String titulo, bool isDark) {
+  final overlay = Overlay.of(context);
+  late OverlayEntry entry;
+
+  entry = OverlayEntry(
+    builder: (_) => OverlayChegada(
+      titulo: titulo,
+      isDark: isDark,
+      onClose: () => entry.remove(),
+    ),
+  );
+
+  overlay.insert(entry);
 }
 
 class GeoUtils {

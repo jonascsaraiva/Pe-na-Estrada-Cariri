@@ -1,6 +1,7 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:pe_na_estrada_cariri/pages/config_page.dart';
+import 'package:pe_na_estrada_cariri/pages/historico_page.dart';
 import 'package:pe_na_estrada_cariri/pages/list_page.dart';
 import 'package:pe_na_estrada_cariri/pages/fav_page.dart';
 import 'package:pe_na_estrada_cariri/pages/map_page.dart';
@@ -17,15 +18,15 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
 
-  final List<Widget> _pages = const [ListPage(), MapPage(), FavPage()];
+  final List<Widget> _pages = const [ListPage(), MapPage(), HistoricoPage()];
 
   final List<IconData> _icons = const [
     Icons.add_location_alt,
     Icons.map_outlined,
-    Icons.favorite_border_outlined,
+    Icons.history,
   ];
 
-  final List<String> _titles = const ["Lista", "Mapa", "Favoritos"];
+  final List<String> _titles = const ["Lista", "Mapa", "Histórico"];
 
   void _onItemTapped(int index) {
     setState(() => _selectedIndex = index);
@@ -47,6 +48,19 @@ class _HomePageState extends State<HomePage> {
                   style: TextStyle(fontSize: 50, fontWeight: FontWeight.bold),
                 ),
               ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.favorite, size: 24),
+              title: const Text(
+                'Favoritos',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
+              ),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const FavPage()),
+                );
+              },
             ),
             ListTile(
               leading: const Icon(Icons.settings, size: 24),

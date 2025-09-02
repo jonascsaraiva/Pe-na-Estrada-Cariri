@@ -55,13 +55,12 @@ class DetailList extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 15),
-                if (loc.descricao != null)
-                  Text(
-                    loc.descricao!,
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
+                Text(
+                  loc.descricao,
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.w700,
                   ),
+                ),
                 const SizedBox(height: 15),
                 const Divider(height: 15),
                 Row(

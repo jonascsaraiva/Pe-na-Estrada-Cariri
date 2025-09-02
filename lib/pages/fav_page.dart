@@ -10,6 +10,9 @@ class FavPage extends StatefulWidget {
 class _FavPageState extends State<FavPage> {
   @override
   Widget build(BuildContext context) {
-    return Placeholder();
+    return Scaffold(
+      appBar: AppBar(title: const Text("Favoritos")),
+      body: Row(children: [Card()]),
+    );
   }
 }
