@@ -1,4 +1,4 @@
-## 🌍 P na Estrada Cariri  
+## 🌍 Pé na Estrada Cariri  
 
 Aplicativo em desenvolvimento com **Flutter** para divulgação e organização de **pontos turísticos da região do Cariri (Juazeiro do Norte, Crato, Barbalha e Missão Velha - CE)**.  
 O projeto é parte de uma disciplina de **Extensão em Sistemas de Informação** e tem como foco unir tecnologia e turismo local.  
@@ -40,12 +40,12 @@ Atualmente, o projeto já conta com:
 
  ## 👥 Autoria
 
-37021838 - Antônio
-37021604 - Ítalo
-37021560 - Janaína
-37020495 - Jonas
-37021831 - Karyna
-37022022 - Ruan
+- 37021838 - Antônio
+- 37021604 - Ítalo
+- 37021560 - Janaína
+- 37020495 - Jonas
+- 37021831 - Karyna
+- 37022022 - Ruan
 
 ---
 
@@ -101,7 +101,4 @@ lib/
  │
  └── main.dart  
  
- ---  
- 
-
-            
+ ---
