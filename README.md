@@ -1,21 +1,23 @@
 ## 🌍 Pé na Estrada Cariri  
 
-Aplicativo em desenvolvimento com **Flutter** para divulgação e organização de **pontos turísticos da região do Cariri (Juazeiro do Norte, Crato, Barbalha e Missão Velha - CE)**.  
+Aplicativo em desenvolvimento com **Flutter** para divulgação e organização de **pontos turísticos da região do Cariri (Juazeiro do Norte, Crato e Barbalha - CE)**. 
 O projeto é parte de uma disciplina de **Extensão em Sistemas de Informação** e tem como foco unir tecnologia e turismo local.  
 
 ---
 
 ## 📖 Descrição do Projeto  
 O app busca facilitar o acesso a informações sobre atrativos turísticos, culturais e religiosos da região, permitindo que usuários:  
-- Visualizem pontos turísticos em lista ou mapa.  
-- Acessem detalhes como descrições, horários de funcionamento e dicas.  
-- Montem roteiros personalizados de visita.  
-- Utilizem a interface em **tema claro e escuro**, com alternância global.  
+- 🌐Visualizem pontos turísticos em lista ou mapa.  
+- 📄Acessem detalhes como descrições, horários de funcionamento e fotos. 
+- 🗺️Montem roteiros personalizados de visita com navegação em tempo real. 
+- 📊Visualizem histórico de visitas automaticamente salvo. 
+- 🎨Utilizem a interface em tema claro e escuro, com alternância global.
+- 🏁Recebam notificações visuais ao chegar a um ponto.
 
 Atualmente, o projeto já conta com:  
-- **Estrutura de temas separados** (`tema_claro` e `tema_escuro`) aplicados de forma global.  
-- Organização inicial de pastas para expansão futura (UI, dados e lógica de negócio).  
-- Base pronta para integração de **mapa interativo** e **dados locais/JSON**.  
+- ✅Estrutura de temas separados (`tema_claro` e `tema_escuro`) aplicados de forma global.  
+- ✅Mapa interativo com rotas e atualização de posição em tempo real. 
+- ✅Persistência de histórico de visitas usando Hive, com atualização automática ao acessar a página.  
 
 ---
 
@@ -24,9 +26,9 @@ Atualmente, o projeto já conta com:
 - [x] Lista de pontos turísticos.  
 - [x] Página de detalhes de cada ponto.  
 - [x] Mapa interativo com rotas.  
-- [ ] Roteiros personalizados e exportação.  
-- [ ] Favoritar pontos para acesso rápido.  
-- [ ] Roteiros sugeridos por tema/duração.  
+- [x] Historico de visitas persistênte.  
+- [ ] Favoritar lugares de preferencia.  
+- [ ] Sugestões?  
 
 ---
 
@@ -34,7 +36,10 @@ Atualmente, o projeto já conta com:
 - **Linguagem:** Dart  
 - **Framework:** Flutter  
 - **Gerenciamento de temas:** MaterialApp com separação de temas (light/dark)  
-- **Possível integração futura:** Google Maps API, armazenamento em JSON ou SQLite  
+- **Mapas e navegação:** Google Maps Flutter, cálculo de rotas e distância
+- **Persistência de dados:** Hive (armazenamento de histórico de visitas)
+- **Interface e UI/UX:** Widgets personalizados, overlays animados, botões flutuantes
+- **Possível integração futura:** Favoritos, sugestões, SQLite para armazenamento avançado 
 
 ---
 
