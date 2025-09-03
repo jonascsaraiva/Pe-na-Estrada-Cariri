@@ -22,8 +22,8 @@ class _HomePageState extends State<HomePage> {
 
   final List<IconData> _icons = const [
     Icons.add_location_alt,
-    Icons.map_outlined,
-    Icons.history,
+    Icons.map,
+    Icons.history_toggle_off,
   ];
 
   final List<String> _titles = const ["Lista", "Mapa", "Histórico"];

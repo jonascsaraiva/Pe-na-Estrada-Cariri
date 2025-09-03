@@ -329,7 +329,7 @@ class LocRepository extends ChangeNotifier {
       nome: 'Centro Cultural Daniel Walker',
       endereco: 'R. São Bernardo, 724 - Franciscanos',
       foto:
-          'https://upload.wikimedia.org/wikipedia/commons/2/24/Pra%C3%A7a_Padre_C%C3%ADcero_no_centro_de_Juazeiro_do_Norte.jpg',
+          'https://assets.brasildefato.com.br/2024/09/image_processing20200205-15817-1tcduhl.png',
       latitude: -7.209428680532103,
       longitude: -39.31359443423024,
       descricao:

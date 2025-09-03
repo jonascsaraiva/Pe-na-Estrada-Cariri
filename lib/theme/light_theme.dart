@@ -16,6 +16,16 @@ class AppThemeLight {
         fontSize: 33,
       ),
     ),
+    floatingActionButtonTheme: const FloatingActionButtonThemeData(
+      backgroundColor: Colors.cyan,
+      foregroundColor: Colors.white, // ícone
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(
+          Radius.circular(16),
+        ), // deixa mais quadradinho se quiser
+      ),
+      elevation: 4,
+    ),
 
     // Textos do body
     textTheme: const TextTheme(
