@@ -18,11 +18,11 @@ class AppThemeLight {
     ),
     floatingActionButtonTheme: const FloatingActionButtonThemeData(
       backgroundColor: Colors.cyan,
-      foregroundColor: Colors.white, // ícone
+      foregroundColor: Colors.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.all(
           Radius.circular(16),
-        ), // deixa mais quadradinho se quiser
+        ),
       ),
       elevation: 4,
     ),
